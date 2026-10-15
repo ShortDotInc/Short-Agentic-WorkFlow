@@ -1,0 +1,24 @@
+# .github/workflows/team-checks.yml · Graffino agentic team addon
+# Checks branch name, commit titles and the PR description on every PR to {{BASE_BRANCH}}.
+# Self-contained: the logic is .github/scripts/team-checks.py in this repo.
+name: team-checks
+
+on:
+  pull_request:
+    branches: [{{BASE_BRANCH}}]
+    types: [opened, reopened, edited, synchronize, ready_for_review]
+
+permissions:
+  contents: read
+
+jobs:
+  team-checks:
+    runs-on: {{RUNNER}}
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: python3 .github/scripts/team-checks.py
+        env:
+          PREFIX: {{PREFIX}}

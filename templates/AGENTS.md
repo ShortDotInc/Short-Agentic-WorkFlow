@@ -1,0 +1,76 @@
+# AGENTS.md — {{repo}}
+
+<!-- graffino-agentic:begin v1 -->
+## How we work here
+
+**Before any work:** `git fetch --all --prune`, then `git pull --ff-only`. Stop on a
+non-fast-forward or on uncommitted changes you did not make.
+
+**Always load:** `docs/agents/DECISIONS.md`, `docs/agents/PATTERNS.md`,
+`docs/agents/OPEN-QUESTIONS.md`, `CONTEXT.md`. UI work also loads
+`docs/design/DESIGN.md` and `docs/design/registry.yaml`.
+
+**Flow:** a change to more than a few lines, or one with a design choice, starts with
+`/plan`. The approved plan runs with `/build`. Small fixes go straight to build, with
+tests first where tests exist.
+
+### The gate
+Ask yourself: **does this change something already approved?**
+- **Do, then report:** add a `candidate` pattern; add or answer an open question
+  (only with an answer the user gave); fix a typo, link or moved path; code that
+  follows the approved entries.
+- **Propose and wait:** change, supersede or delete an `approved` pattern or
+  decision; promote `candidate → approved`; add a decision; code that contradicts an
+  entry. Use this shape, then stop:
+
+```text
+PROPOSAL: <add-decision | change | supersede | promote | delete>
+- Existing: <ID and what it says, or "none">
+- Proposed: <the new rule>
+- Why now: <what changed>
+- Impact: <files that follow the old rule>
+```
+
+### Hard rules
+- Build only from `approved` entries. Unanswered means out of scope: record a Q-,
+  never invent a value, a requirement or a behaviour.
+- Add nothing nobody asked for. Note it as a suggestion instead.
+- Tests first where the repo has tests. Never change what an existing test asserts
+  to make code pass; an assertion you think is wrong goes to the user.
+- Never write a secret, token, password or personal data into a file, commit or log.
+- Never push, tag, release, or deploy without the user's go for that action.
+- The code wins over any document. When they disagree, say so and fix the document.
+- Report honestly: a failed check is reported with its output; a skipped step is
+  named with its reason.
+
+### Ledger rules
+- IDs are one sequence per kind in this repo: `D-`, `PATTERN-`, `Q-`. Never renumber.
+- Superseded entries stay (`status: superseded-by <ID>`) so old code stays explainable.
+- A new reusable practice becomes a `candidate` pattern in the same session.
+- A settled constraint becomes a decision PROPOSAL in the same session.
+<!-- graffino-agentic:end -->
+
+## 1. What this repo is
+{{3–5 lines: purpose, who uses it, where it runs}}
+
+## 2. Stack and commands
+{{stack, one line}}
+
+```bash
+{{exact commands: install, build, run, test, lint/type-check, screenshot (visual apps)}}
+```
+
+## 3. Layout
+{{top-level folders, one line each}}
+
+## 4. Rules for this repo
+{{day-to-day mechanics only. Anything with a reason behind it lives in docs/agents/.}}
+
+## 5. Release
+{{branches, version source, changelog, tag, deploy; who must say go}}
+
+## 6. Definition of done
+- {{tests command}} passes.
+- {{build / type-check command}} passes.
+- {{visual apps: screenshots of every changed screen, light and dark, compared with DESIGN.md}}
+- New practices recorded as candidate patterns; open points recorded as Q- entries.
