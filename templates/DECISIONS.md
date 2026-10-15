@@ -18,3 +18,6 @@
 - **Why:** {{the reason; the incident or constraint behind it}}
 - **Rejected:** {{alternatives considered and why not}}
 - **Evidence:** {{path:line, commit hash}}
+- **Source:** {{code | git | pr | docs | memory | user | backfill R-0NN}} · confidence {{high | medium | low}}
+- **Owner note:** {{optional: what the user added when deciding}}
+- **Confirmed:** {{YYYY-MM-DD — set when the user confirms it in a plan; removed on any edit}}

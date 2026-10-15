@@ -4,31 +4,49 @@ A Claude Code skill that installs a small, self-contained agentic working system
 any code repository, new or existing. Every file it writes lives in that repository;
 there is no shared rules folder and no separate docs repo.
 
-Adapted from the FiscalLink-Docs system, simplified: no tickets, no PRs, no reviews
-by default. An optional **team addon** brings them back.
+The base has no tickets, no PRs and no reviews by default. An optional **team addon** brings them back.
 
 ## What it adds to a repo
 
 | Part | Files |
 |---|---|
 | Rules the agent always loads | `AGENTS.md` (+ `CLAUDE.md` = `@AGENTS.md`), `CONTEXT.md` (project vocabulary) |
-| Knowledge ledger with a gate | `docs/agents/DECISIONS.md`, `PATTERNS.md`, `OPEN-QUESTIONS.md` |
+| Knowledge ledger with a gate | `docs/agents/DECISIONS.md`, `PATTERNS.md`, `CONTRACTS.md` (C- IDs), `OPEN-QUESTIONS.md`, `ARCHITECTURE.md` |
+| Ledger tooling | `docs/agents/tools/ledger-lint.py` (checks IDs, fields, links; rebuilds indexes; `--next D`); index + topic files above ~150 lines; `Confirmed:` dates collapse in plans |
+| Guide for people | `docs/agents/README.md` |
+| Backfill (existing repos) | read-only agents mine code, git history, PRs, docs and memory; clashes only go to a temporary review UI; record in `BACKFILL-REVIEW.md` |
 | Plan, then build (tests first) | `.claude/skills/plan`, `.claude/skills/build`, `.claude/agents/planner.md`, `builder.md` |
 | Visual apps: design guardrails | `docs/design/DESIGN.md` (rules, procedure, real tokens), `registry.yaml` (DS- IDs), `screens/` |
-| Optional team addon | ticket-first work, ticket branches and commit titles, draft PRs (5-section template), `/start <ticket>` pipeline (product owner → plan → test author → build → reviewer, 3 user gates), a journal per ticket, manual tests, a self-contained CI check |
+| Optional ClickUp addon | CI comments branch/PR links on the ticket, moves it to "in review" when the PR is ready (never backwards), comments "released in" on every ticket of a tag; publishes `docs/agents` to a ClickUp Doc (pages edited in ClickUp are skipped and reported) |
+| Optional Slack addon | CI posts "<PR> Ready for review." and a release notice (tickets, open manual tests) through a webhook |
+| Optional team addon | `STATE.md` (tickets in flight), ticket-first work, ticket branches and commit titles, draft PRs (5-section template), `/start <ticket>` pipeline (product owner → plan → test author → build → reviewer, 3 user gates), a journal per ticket, manual tests, a self-contained CI check |
 
-The skill asks every time whether to add the team addon. For the CI check it asks
-which runner to use.
+The skill asks every time whether to add each addon (team, ClickUp, Slack). For every
+CI workflow it asks which runner to use. Addon automation is a dry run (log only)
+until you set the repository variable `AUTOMATION_LIVE=true`; tokens live in
+1Password and in repository secrets, never in files.
 
 ### The gate
 *Does this change something already approved?* Additive work (a candidate pattern,
 an open question, code that follows approved entries) is done, then reported. A
 change to an approved decision or pattern is a written PROPOSAL, and the agent waits.
 
-### Existing repos
-The skill reads the existing `CLAUDE.md` / `AGENTS.md`, `docs/`, and the local Claude
-memory for that repo. It turns each fact into a ledger entry after it checks the fact
-against the code, and drops stale facts with a reason. It never drops a rule.
+### Existing repos: the backfill
+On the first run, parallel read-only agents mine the repo through five lenses:
+structure, contracts, rules, history (full git log and merged PRs) and docs (CLAUDE.md,
+AGENTS.md, README, docs/, the local Claude memory).
+
+- **Assume from the code.** What the code consistently follows becomes an `approved`
+  entry with `path:line` evidence. Nobody has to confirm it.
+- **Review only clashes:** docs vs code, two ways of doing one thing, contradictions,
+  contract sides that disagree. The skill opens a temporary local review page: one
+  clash per card, keys `1`–`9` / `R` (recommendation) / `E` (own answer) / `X`
+  (reject), "Accept all recommendations", instant save. "Done" stops it, and the
+  answers become ledger entries.
+- **Contracts:** the repo that provides an interface owns its `C-` entry; consumers
+  link to it. With the other repo on disk, both sides are compared.
+
+Stale facts are dropped with a reason. No rule is dropped.
 
 ## Install
 
@@ -71,5 +89,8 @@ The marker carries the major version; releases follow semver (`VERSION`,
 SKILL.md                  the procedure Claude follows
 templates/                base files (AGENTS, CLAUDE, CONTEXT, ledger, plan/build, agents)
 templates/design/         DESIGN.md + registry.yaml for visual apps
+templates/backfill/       archaeologist brief + the temporary review UI (server + page)
 templates/team/           the optional team addon (rules, agents, /start, journal, PR template, CI)
+templates/clickup/        the optional ClickUp addon (clickup-sync.py, workflow, settings, rules)
+templates/slack/          the optional Slack addon (slack-notify.py, workflow, settings, rules)
 ```

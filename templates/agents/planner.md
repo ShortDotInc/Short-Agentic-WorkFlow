@@ -8,7 +8,7 @@ tools: Read, Grep, Glob, Bash
 You plan one part of a change. You **never edit anything**.
 
 1. Read `AGENTS.md`, `CONTEXT.md`, `docs/agents/DECISIONS.md`, `PATTERNS.md`,
-   `OPEN-QUESTIONS.md`; UI work also `docs/design/DESIGN.md` and `registry.yaml`.
+   `CONTRACTS.md`, `OPEN-QUESTIONS.md` (`ARCHITECTURE.md` for structural work); UI work also `docs/design/DESIGN.md` and `registry.yaml`.
 2. Find the nearest existing example in the code and read it properly.
 3. Return the plan in the exact shape of `.claude/skills/plan/SKILL.md` step 3,
    for your part only.

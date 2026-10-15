@@ -1,0 +1,36 @@
+# .github/workflows/slack.yml · Graffino agentic Slack addon
+# PR ready for review → "<PR> Ready for review." · Tag vX.Y.Z → release notice (tickets, open manual tests).
+# Dry run (prints the message) until the repository variable AUTOMATION_LIVE is "true".
+# Logic: .github/scripts/slack-notify.py (in this repo). Skips quietly without the secret.
+name: slack
+
+on:
+  pull_request:
+    branches: [{{BASE_BRANCH}}]
+    types: [opened, ready_for_review]
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: read
+
+jobs:
+  slack:
+    runs-on: {{RUNNER}}
+    timeout-minutes: 5
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      AUTOMATION_LIVE: ${{ vars.AUTOMATION_LIVE }}
+      PREFIX: {{PREFIX}}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Ready for review
+        if: >-
+          github.event_name == 'pull_request' && (github.event.action == 'ready_for_review' ||
+          (github.event.action == 'opened' && !github.event.pull_request.draft))
+        run: python3 .github/scripts/slack-notify.py pr-ready
+      - name: Release notice
+        if: github.event_name == 'push'
+        run: python3 .github/scripts/slack-notify.py release "${GITHUB_REF_NAME}"

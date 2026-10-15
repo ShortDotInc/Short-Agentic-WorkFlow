@@ -33,10 +33,18 @@ red) → `/build` → reviewer (at most 2 rounds) → **gate C** (you review and
 reviewer (1 round) → gate C. When the intended behaviour changes, the test author
 goes first again.
 
+### IDs
+Before you take the next ledger ID: `git fetch`, then `ledger-lint.py --next D` on the
+up-to-date base branch. On a collision, the ID already on the base branch wins;
+renumber yours.
+
 ### Journal
 Every session ends written down, finished or not, in
 `docs/agents/tasks/{{PREFIX}}-<id>/`: `OVERVIEW.md` ("Resume here", status,
 manifest) and `log_YYYY-MM-DD_HHMM.md`. Templates: `docs/agents/tasks/_templates/`.
-"What happened on {{PREFIX}}-123?" is answered from that folder alone.
+"What happened on {{PREFIX}}-123?" is answered from that folder alone. Load only the
+one ticket folder you need, never the whole journal.
+`docs/agents/STATE.md` holds one row per ticket in flight and the last 10 done;
+every session that starts, pauses or finishes a ticket updates its row.
 {{MANUAL_TESTS_RULE}}
 <!-- graffino-agentic:team:end -->
