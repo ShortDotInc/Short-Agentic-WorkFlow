@@ -17,10 +17,14 @@ The base has no tickets, no PRs and no reviews by default. An optional **team ad
 | Backfill (existing repos) | read-only agents mine code, git history, PRs, docs and memory; clashes only go to a temporary review UI; record in `BACKFILL-REVIEW.md` |
 | Plan, then build (tests first) | `.claude/skills/plan`, `.claude/skills/build`, `.claude/agents/planner.md`, `builder.md` |
 | Visual apps: design guardrails | `docs/design/DESIGN.md` (rules, procedure, real tokens), `registry.yaml` (DS- IDs), `screens/` |
+| Optional ClickUp addon | CI comments branch/PR links on the ticket, moves it to "in review" when the PR is ready (never backwards), comments "released in" on every ticket of a tag; publishes `docs/agents` to a ClickUp Doc (pages edited in ClickUp are skipped and reported) |
+| Optional Slack addon | CI posts "<PR> Ready for review." and a release notice (tickets, open manual tests) through a webhook |
 | Optional team addon | `STATE.md` (tickets in flight), ticket-first work, ticket branches and commit titles, draft PRs (5-section template), `/start <ticket>` pipeline (product owner → plan → test author → build → reviewer, 3 user gates), a journal per ticket, manual tests, a self-contained CI check |
 
-The skill asks every time whether to add the team addon. For the CI check it asks
-which runner to use.
+The skill asks every time whether to add each addon (team, ClickUp, Slack). For every
+CI workflow it asks which runner to use. Addon automation is a dry run (log only)
+until you set the repository variable `AUTOMATION_LIVE=true`; tokens live in
+1Password and in repository secrets, never in files.
 
 ### The gate
 *Does this change something already approved?* Additive work (a candidate pattern,
@@ -87,4 +91,6 @@ templates/                base files (AGENTS, CLAUDE, CONTEXT, ledger, plan/buil
 templates/design/         DESIGN.md + registry.yaml for visual apps
 templates/backfill/       archaeologist brief + the temporary review UI (server + page)
 templates/team/           the optional team addon (rules, agents, /start, journal, PR template, CI)
+templates/clickup/        the optional ClickUp addon (clickup-sync.py, workflow, settings, rules)
+templates/slack/          the optional Slack addon (slack-notify.py, workflow, settings, rules)
 ```

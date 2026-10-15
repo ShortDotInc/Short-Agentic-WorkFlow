@@ -2,6 +2,18 @@
 
 ## 1.2.0 — 2026-10-15
 
+- **ClickUp addon** (always asked): `.github/scripts/clickup-sync.py` (stdlib) +
+  `clickup.yml`. CI comments the branch and PR links on the ticket (once), comments
+  and moves the ticket to the ready status when a PR is ready (never backwards),
+  and comments "released in" on every ticket of a tag. `publish-docs` publishes
+  `docs/agents` (+ DESIGN.md) to a ClickUp Doc, one page per file, topic files under
+  their index page; a page edited in ClickUp is skipped and reported (`--force` to
+  overwrite). Dry run until `AUTOMATION_LIVE=true`.
+- **Slack addon** (always asked): `.github/scripts/slack-notify.py` (stdlib) +
+  `slack.yml`: "<PR> Ready for review." and a release notice with the tickets and
+  the manual tests still open, through an incoming webhook. Dry run until
+  `AUTOMATION_LIVE=true`.
+
 - **Ledger lint** (`docs/agents/tools/ledger-lint.py`, copied into each repo):
   unique IDs per kind, required fields incl. evidence, valid statuses,
   `superseded-by` targets exist, indexes in sync (`--fix` rebuilds them),

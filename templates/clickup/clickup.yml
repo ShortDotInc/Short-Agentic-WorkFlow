@@ -1,0 +1,40 @@
+# .github/workflows/clickup.yml · Graffino agentic ClickUp addon
+# PR opened → branch + PR links on the ticket · PR ready → comment + ticket to the ready status
+# Tag vX.Y.Z → "released in" comment on every ticket in the release.
+# Dry run (log only) until the repository variable AUTOMATION_LIVE is "true".
+# Logic: .github/scripts/clickup-sync.py (in this repo). Skips quietly without the secret.
+name: clickup
+
+on:
+  pull_request:
+    branches: [{{BASE_BRANCH}}]
+    types: [opened, reopened, ready_for_review]
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: read
+
+jobs:
+  clickup:
+    runs-on: {{RUNNER}}
+    timeout-minutes: 5
+    env:
+      CLICKUP_API_TOKEN: ${{ secrets.CLICKUP_API_TOKEN }}
+      AUTOMATION_LIVE: ${{ vars.AUTOMATION_LIVE }}
+      PREFIX: {{PREFIX}}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Link branch and PR on the ticket
+        if: github.event_name == 'pull_request' && (github.event.action == 'opened' || github.event.action == 'reopened')
+        run: python3 .github/scripts/clickup-sync.py pr-link
+      - name: Ready for review
+        if: >-
+          github.event_name == 'pull_request' && (github.event.action == 'ready_for_review' ||
+          (github.event.action == 'opened' && !github.event.pull_request.draft))
+        run: python3 .github/scripts/clickup-sync.py pr-ready
+      - name: Release comments
+        if: github.event_name == 'push'
+        run: python3 .github/scripts/clickup-sync.py release "${GITHUB_REF_NAME}"

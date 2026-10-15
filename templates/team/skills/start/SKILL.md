@@ -33,8 +33,10 @@ user and hold the gates. You do not analyse, plan or write code yourself.
    uncovered case → test author first. **At most 2 rounds**, then bring it to the user.
 6. **Gate C:** report what was built, tests (added · passing · assertions changed by
    the builder: must be 0), deviations, the verdict, files, branch and PR, manual
-   tests. When the user says so: mark the PR ready (checks green), send the
-   ready-for-review notice from TEAM.md, move the ticket to in review. Merging is
+   tests. When the user says so: mark the PR ready (checks green). With the Slack
+   and ClickUp addons, CI then posts the notice and moves the ticket; check those runs
+   instead of doing it by hand. Without them: send the ready-for-review notice from
+   TEAM.md and move the ticket to in review. Merging is
    the user's.
 
 ## Fast lane (size S)

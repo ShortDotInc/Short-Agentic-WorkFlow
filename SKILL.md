@@ -1,6 +1,6 @@
 ---
 name: graffino-agentic-code-setup
-description: Set up or update the agentic working rules in a code repository - AGENTS.md, CLAUDE.md, CONTEXT.md, a decisions/patterns/contracts/open-questions ledger and ARCHITECTURE.md, filled for existing repos by a backfill that assumes from the code and opens a temporary review UI for clashes only, /plan and /build skills, planner and builder agents, and for visual apps the design guardrails, design registry and screenshot procedure; optionally a team addon (tickets, PRs, reviews, journals) that it always asks about. Use for a new project, for an existing repo without these files, or to bring a repo up to the current version ("/graffino-agentic-code-setup", "set up agent rules", "add the agentic setup to this repo", "update the project setup", "backfill this repo", "review the backfill", "apply the backfill review").
+description: Set up or update the agentic working rules in a code repository - AGENTS.md, CLAUDE.md, CONTEXT.md, a decisions/patterns/contracts/open-questions ledger and ARCHITECTURE.md, filled for existing repos by a backfill that assumes from the code and opens a temporary review UI for clashes only, /plan and /build skills, planner and builder agents, and for visual apps the design guardrails, design registry and screenshot procedure; optionally a team addon (tickets, PRs, reviews, journals), a ClickUp addon (automatic ticket comments, docs published to a ClickUp Doc) and a Slack addon (PR-ready and release notices), each asked about every time. Use for a new project, for an existing repo without these files, or to bring a repo up to the current version ("/graffino-agentic-code-setup", "set up agent rules", "add the agentic setup to this repo", "update the project setup", "backfill this repo", "review the backfill", "apply the backfill review").
 ---
 
 # Graffino Agentic Code Setup
@@ -227,6 +227,7 @@ CI checks. Everything is stored in this repo; there is no separate docs repo.
 **Ask the user every time** (AskUserQuestion), before writing files: "Add the team
 addon (tickets, PRs, reviews) to this repo?" Default: no. A re-run on a repo that
 already has the `graffino-agentic:team` block updates it without asking again.
+The ClickUp and Slack addons (3c, 3d) are asked the same way, after this one.
 
 If yes, ask in one go for the settings in `templates/team/TEAM.md`: ticket prefix,
 manual-test paths, waiver person and baseline date (if manual tests = yes),
@@ -253,6 +254,67 @@ Then write, filling `{{…}}` from the answers:
 
 Test the CI script once locally on the current branch before the commit
 (`PREFIX=<prefix> python3 .github/scripts/team-checks.py --branch <name> --base <base>`).
+
+## 3c. ClickUp addon (optional — always ask)
+
+Adds, inside this repo: automatic ticket comments from CI (branch and PR links when a
+PR opens; a comment and the ticket moved to the ready status when a PR is ready, never
+backwards; a "released in" comment on every ticket in a tagged release), and
+publishing of `docs/agents` (+ `docs/design/DESIGN.md`) to a ClickUp Doc, one page per
+file, with pages edited in ClickUp skipped and reported ("edit in the repo, comment in
+ClickUp"). Ticket comments need the team addon (ticket IDs in branches and commits);
+docs publishing works without it.
+
+**Ask the user every time** (AskUserQuestion): "Add the ClickUp addon (ticket comments
+and/or docs publishing)?" Default: no. A repo that already has the
+`graffino-agentic:clickup` block is updated without asking.
+
+If yes, ask in one go: which parts (ticket comments, docs publishing), the ClickUp
+workspace ID, the Doc for the docs (an existing Doc ID, or ask the user to create one
+and give its ID — never create it yourself), the ready status name and the status
+order, the 1Password item that holds the API token, and **which runner** for the CI
+workflow (Graffino self-hosted or GitHub-hosted; never pick one).
+
+| File | Template |
+|---|---|
+| `AGENTS.md` | append `templates/clickup/AGENTS.clickup.md` (its own marked block) |
+| `docs/agents/clickup.json` | `templates/clickup/clickup.json` (`status_order` as a JSON array) |
+| `.github/scripts/clickup-sync.py` | `templates/clickup/clickup-sync.py` (set the `PREFIX` default) |
+| `.github/workflows/clickup.yml` | `templates/clickup/clickup.yml` (only for ticket comments) |
+
+**Secrets:** the token lives in 1Password as an **API Credential** item. Tell the user
+to add the repository secret `CLICKUP_API_TOKEN` and, when ready, the repository
+variable `AUTOMATION_LIVE=true` (until then every run is a dry run that only logs).
+Never set secrets or variables yourself, and never print a token.
+
+Check before the commit: `python3 .github/scripts/clickup-sync.py publish-docs` without
+`AUTOMATION_LIVE` (a dry run) lists the pages it would create.
+
+## 3d. Slack addon (optional — always ask)
+
+Adds a CI notice "<PR> Ready for review." when a PR is ready (needs the team addon),
+and a release notice on every tag: the release, its tickets (linked when a ticket URL
+is set) and the manual tests still open. Posts through an incoming webhook.
+
+**Ask the user every time** (AskUserQuestion): "Add the Slack addon (PR-ready and
+release notices)?" Default: no. A repo that already has the `graffino-agentic:slack`
+block is updated without asking.
+
+If yes, ask in one go: the channel (a label for the docs; the webhook decides the real
+channel), which notices, the ticket URL pattern (with `{ticket}`), the 1Password item
+that holds the webhook URL, and **which runner** for the CI workflow.
+
+| File | Template |
+|---|---|
+| `AGENTS.md` | append `templates/slack/AGENTS.slack.md` (its own marked block) |
+| `docs/agents/slack.json` | `templates/slack/slack.json` |
+| `.github/scripts/slack-notify.py` | `templates/slack/slack-notify.py` |
+| `.github/workflows/slack.yml` | `templates/slack/slack.yml` |
+
+**Secrets:** the webhook URL is a secret (1Password API Credential item). Tell the user
+to add the repository secret `SLACK_WEBHOOK_URL` and the variable
+`AUTOMATION_LIVE=true` when ready. Never post to Slack during setup; check with a dry
+run: `python3 .github/scripts/slack-notify.py text "test"` prints the message only.
 
 ## 4. Visual apps: extract the design
 
@@ -295,7 +357,8 @@ Show the user, before any commit:
    made because the docs lagged behind the code.
 5. Visual apps: token summary, number of DS- entries, hard-coded value findings.
 6. Commands that failed or were not run.
-7. Team addon: added or not; if added, the settings used.
+7. Addons (team, ClickUp, Slack): added or not; the settings used; the secrets and
+   variables the user must add, and which runner each workflow uses.
 
 On the user's go:
 - Branch `chore/agentic-code-setup` from the default branch (develop if present).
