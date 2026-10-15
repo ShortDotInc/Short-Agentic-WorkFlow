@@ -7,7 +7,8 @@
 non-fast-forward or on uncommitted changes you did not make.
 
 **Always load:** `docs/agents/DECISIONS.md`, `docs/agents/PATTERNS.md`,
-`docs/agents/OPEN-QUESTIONS.md`, `CONTEXT.md`. UI work also loads
+`docs/agents/CONTRACTS.md`, `docs/agents/OPEN-QUESTIONS.md`, `CONTEXT.md`. Load
+`docs/agents/ARCHITECTURE.md` before structural work. UI work also loads
 `docs/design/DESIGN.md` and `docs/design/registry.yaml`.
 
 **Flow:** a change to more than a few lines, or one with a design choice, starts with
@@ -44,7 +45,9 @@ PROPOSAL: <add-decision | change | supersede | promote | delete>
   named with its reason.
 
 ### Ledger rules
-- IDs are one sequence per kind in this repo: `D-`, `PATTERN-`, `Q-`. Never renumber.
+- IDs are one sequence per kind in this repo: `D-`, `PATTERN-`, `C-`, `Q-`. Never renumber.
+- A provided contract (C-) lives here only; consumers link to it. Changing one is a
+  PROPOSAL, and the plan names the consumer files too.
 - Superseded entries stay (`status: superseded-by <ID>`) so old code stays explainable.
 - A new reusable practice becomes a `candidate` pattern in the same session.
 - A settled constraint becomes a decision PROPOSAL in the same session.

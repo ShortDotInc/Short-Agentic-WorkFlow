@@ -1,6 +1,6 @@
 ---
 name: graffino-agentic-code-setup
-description: Set up or update the agentic working rules in a code repository - AGENTS.md, CLAUDE.md, CONTEXT.md, a decisions/patterns/open-questions ledger, /plan and /build skills, planner and builder agents, and for visual apps the design guardrails, design registry and screenshot procedure; optionally a team addon (tickets, PRs, reviews, journals) that it always asks about. Use for a new project, for an existing repo without these files, or to bring a repo up to the current version ("/graffino-agentic-code-setup", "set up agent rules", "add the agentic setup to this repo", "update the project setup").
+description: Set up or update the agentic working rules in a code repository - AGENTS.md, CLAUDE.md, CONTEXT.md, a decisions/patterns/contracts/open-questions ledger and ARCHITECTURE.md, filled for existing repos by a backfill that assumes from the code and opens a temporary review UI for clashes only, /plan and /build skills, planner and builder agents, and for visual apps the design guardrails, design registry and screenshot procedure; optionally a team addon (tickets, PRs, reviews, journals) that it always asks about. Use for a new project, for an existing repo without these files, or to bring a repo up to the current version ("/graffino-agentic-code-setup", "set up agent rules", "add the agentic setup to this repo", "update the project setup", "backfill this repo", "review the backfill", "apply the backfill review").
 ---
 
 # Graffino Agentic Code Setup
@@ -17,7 +17,7 @@ Text between `<!-- graffino-agentic:begin vN -->` and `<!-- graffino-agentic:end
 owned by this skill; text outside the markers belongs to the repo and is never
 removed.
 
-Current version: **v1** (release 1.0.0; the markers carry the major version only).
+Current version: **v1** (release 1.1.0; the markers carry the major version only).
 
 ## 0. Preconditions
 
@@ -47,23 +47,120 @@ Find out, from the files (never guess):
 
 A fact you cannot find becomes an open question, not a value.
 
-## 2. Collect existing knowledge
+## 2. Backfill (existing repos)
 
-Turn every rule or fact that has a reason behind it into a ledger entry:
+A repo with code needs its knowledge written down before the rules mean anything:
+without a backfill, decisions, patterns and contracts start empty. Run it on the
+first setup of an existing repo, and again when the user asks ("backfill again").
+A brand-new, empty repo skips it.
 
-- **Decision (D-NNN):** a constraint the code must obey ("teams/*.yml are generated;
-  change the generator"). Status `approved` if the code already follows it.
-- **Pattern (PATTERN-NNN):** how we build a kind of thing here, with the file that
-  shows it. Status `approved` if the existing code consistently follows it,
-  otherwise `candidate`.
-- **Open question (Q-NNN):** something unknown that blocks a decision.
+**The principle: assume from the code, review only clashes.** The code is the
+strongest evidence of how this repo works. An entry the code consistently follows is
+recorded as `approved` with that evidence; nobody needs to confirm it. Only items
+where sources disagree go to the user, in one review page.
 
-Sources: existing CLAUDE.md/AGENTS.md, docs/, repo memory files, comments that state
-a rule (`NEVER`, `must`, `do not`), the git log of fixes that encode a lesson.
+### 2.1 Mine (parallel agents)
+Spawn these as `general-purpose` agents in one message (read-only: they return
+findings, they never write). Give each the repo path, the Detect results and the
+brief in `templates/backfill/archaeologist.md` with its **lens**:
 
-**Check each fact against the code before you record it.** A memory fact that names
-a file, function or flag that no longer exists is dropped (say so in the summary).
-Keep entries short: one rule, one reason, the evidence (`path:line` or commit hash).
+| Lens | Finds |
+|---|---|
+| `structure` | parts, entry points, data flow, external services, config, deploy → ARCHITECTURE; layering and module patterns |
+| `contracts` | every interface this repo provides or consumes (see 2.3) |
+| `rules` | constraints: guards, validations, invariants, "never/must" comments, CI and Makefile gates, generated files, security boundaries |
+| `history` | `git log` (full), merge/PR titles (`gh pr list --state merged --limit 200` if a remote exists), fix and revert commits → lessons behind the rules; how practices changed over time |
+| `docs` | existing CLAUDE.md / AGENTS.md / README / docs/ / the repo's local Claude memory, each fact checked against the code |
+
+Visual apps run step 4 (design) as one more parallel agent.
+
+Small repo (under ~50 source files): one agent with all lenses is enough.
+
+### 2.2 Classify each finding
+| Evidence | Becomes | Status |
+|---|---|---|
+| The code follows it everywhere it applies (≥ 2 consistent instances, or one enforced guard/test) | D- or PATTERN- | **approved** (assumed) |
+| A written rule (docs, memory, comment) that the code follows | D- or PATTERN- | **approved** (assumed) |
+| Seen once, nothing contradicts it | PATTERN- | candidate |
+| Unknown, and it blocks a decision | Q- | open |
+| **A clash** (below) | review item | — |
+
+**A clash** is any of:
+1. A written rule (docs, memory, comment, README) that the code does not follow.
+2. Two or more ways of doing the same thing in the code, with no clear current one
+   (the newest way is not clearly the intended one).
+3. Two findings that contradict each other.
+4. A contract whose two sides disagree (2.3).
+5. A rule that looks deliberately broken somewhere (a guard skipped in one place).
+
+For a clash in group 2, when git history shows the old way is being replaced (newer
+commits all use the new way), it is **not** a clash: record the new way as
+`approved` and the old as `superseded-by`, with the commits as evidence.
+
+Every entry keeps: one rule, one reason, evidence (`path:line` or commit). The reason
+comes from the code, the commit message or the docs; if none states it, write
+"Why: inferred — <your reading>" so a reader knows it was not stated.
+
+Stale facts (memory or docs naming a file, function or flag that no longer exists)
+are dropped and listed in the report.
+
+### 2.3 Contracts
+A contract is a promise across a boundary: an HTTP API (routes, request/response
+shapes, status codes, auth), a file or object another program reads (JSON/YAML
+schemas, S3 keys, paths), a CLI or script interface (args, exit codes, output), a
+queue/event/webhook payload, env vars another system sets, a database another app
+reads, a URL scheme, a package or installer identity.
+
+- **Ownership:** the side that **provides** the interface owns the entry in its
+  `docs/agents/CONTRACTS.md` (C- ID). The consuming side lists it under "Consumed"
+  with a link `<repo>:docs/agents/CONTRACTS.md#C-0NN` and the exact fields it relies
+  on. The text lives in one place only.
+- **Other repo on disk** (sibling folders, or a path in README/config): read its side.
+  Shapes that disagree are a clash. A provider repo without the agentic setup yet:
+  write the full contract as "Consumed (provider not set up yet)" here; the
+  provider's own setup later takes ownership and this side becomes a link.
+- **External services** (Fleet, Stripe, AWS, Apple…): record what this repo relies
+  on under "External", with the version or docs link if known.
+
+### 2.4 The review (only if there are clashes)
+No clashes: no review; say so in the report.
+
+Otherwise, one item per clash (`R-001`…), each with the sources side by side, 2–4
+options, **your recommendation** and why, and the entries waiting on it:
+
+1. Write the working file `docs/agents/backfill-review.json` (shape in the header of
+   `templates/backfill/review-server.py`; `recommendation` is the 0-based option index).
+2. Write the record `docs/agents/BACKFILL-REVIEW.md` from `templates/BACKFILL-REVIEW.md`
+   (the same items, readable in git).
+3. **Open the temporary review UI:** run in the background
+   `python3 -I <skill dir>/templates/backfill/review-server.py docs/agents/backfill-review.json`
+   (`<skill dir>` = the folder of this SKILL.md). It serves one page on 127.0.0.1
+   with a random token, opens the browser, and prints `REVIEW_URL <url>`. Give the
+   user that URL. Never push the URL or token anywhere.
+4. The user decides each item: keys `1`–`9` pick an option, `R` takes the
+   recommendation, `E` an own answer, `X` rejects the finding, `U` undoes, arrows or
+   `J`/`K` move, "Accept all recommendations" decides every open item at once.
+   Every click saves to the JSON file at once. "Done" stops the server
+   (`REVIEW_DONE answered=n/m`); it also stops by itself after 120 idle minutes.
+5. Do not wait idle in the meantime: write everything that does not depend on a
+   review item. When the server stops (you are notified), run 2.5.
+
+The user can also answer in chat or by editing `Answer:` lines in the .md file; then
+run 2.5 from that.
+
+Entries that depend on a pending review item are not written yet. Everything else is
+written now.
+
+### 2.5 Apply the review
+From the answers in `backfill-review.json` (or chat / the .md file):
+- Option or own answer → an `approved` entry (or a supersede of an old one). An
+  answer that means "the code is wrong" → a code-fix suggestion in the report, never
+  a silent code change.
+- `reject` → the item moves to "Rejected" in BACKFILL-REVIEW.md with the reason.
+- Move decided items to "Decided" (R-ID · answer · date · resulting entry). Items left
+  open stay open; the user can run "review the backfill" later to reopen the UI.
+- When no item is open, delete `backfill-review.json` (the UI is temporary); keep
+  BACKFILL-REVIEW.md as the record of what was decided at backfill.
 
 Existing CLAUDE.md content: move it into AGENTS.md (section 4 or the ledger) and leave
 CLAUDE.md as `@AGENTS.md`. Never drop a rule; if you can't place it, keep it in
@@ -79,6 +176,9 @@ AGENTS.md section 4 verbatim.
 | `docs/agents/DECISIONS.md` | `templates/DECISIONS.md` | entries from step 2 |
 | `docs/agents/PATTERNS.md` | `templates/PATTERNS.md` | entries from step 2 |
 | `docs/agents/OPEN-QUESTIONS.md` | `templates/OPEN-QUESTIONS.md` | facts you could not find |
+| `docs/agents/CONTRACTS.md` | `templates/CONTRACTS.md` | provided, consumed and external interfaces (2.3) |
+| `docs/agents/ARCHITECTURE.md` | `templates/ARCHITECTURE.md` | from the `structure` lens |
+| `docs/agents/BACKFILL-REVIEW.md` | `templates/BACKFILL-REVIEW.md` | only if there are clashes (2.4) |
 | `.claude/skills/plan/SKILL.md` | `templates/skills/plan/SKILL.md` | as is |
 | `.claude/skills/build/SKILL.md` | `templates/skills/build/SKILL.md` | as is; remove the visual step if not visual |
 | `.claude/agents/planner.md` | `templates/agents/planner.md` | as is |
@@ -159,11 +259,15 @@ Test the CI script once locally on the current branch before the commit
 
 Show the user, before any commit:
 1. Files created / merged (path, one line each).
-2. Ledger entries added: D-, PATTERN- (approved vs candidate), Q-, with one line each.
-3. Facts moved from memory, and facts dropped as stale (with why).
-4. Visual apps: token summary, number of DS- entries, hard-coded value findings.
-5. Commands that failed or were not run.
-6. Team addon: added or not; if added, the settings used.
+2. Ledger entries added: D-, PATTERN- (approved vs candidate), C- (provided ·
+   consumed · external), Q-, with one line each. Counts first; list in full only
+   when under ~30 entries, otherwise the index files are the list.
+3. **Review page:** the number of clashes, each in one line with your
+   recommendation, and how to answer. Or "no clashes".
+4. Facts moved from memory, and facts dropped as stale (with why).
+5. Visual apps: token summary, number of DS- entries, hard-coded value findings.
+6. Commands that failed or were not run.
+7. Team addon: added or not; if added, the settings used.
 
 On the user's go:
 - Branch `chore/agentic-code-setup` from the default branch (develop if present).
@@ -177,4 +281,12 @@ On the user's go:
 
 Read the version in the markers. Replace each marked block with the current
 template, keep repo text, keep all ledger entries (never renumber, never delete;
-superseded entries stay). Report what changed.
+superseded entries stay). Add files that are new in this version (for example
+CONTRACTS.md and ARCHITECTURE.md in 1.1). Report what changed.
+
+A repo set up **before the backfill existed** (no `CONTRACTS.md`): run step 2 now.
+Existing entries keep their IDs; new findings continue the sequences; a new finding
+that disagrees with an existing entry is a clash.
+
+"Apply the review": run 2.5 only. "Review the backfill": reopen the UI (2.4 step 3)
+for the open items, then 2.5.

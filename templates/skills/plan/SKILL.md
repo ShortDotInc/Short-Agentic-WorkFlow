@@ -11,7 +11,8 @@ drops. Nothing is built from an unapproved plan.
 
 ## 1. Load
 1. `git fetch --all --prune`, `git pull --ff-only`; note the branch and any uncommitted work.
-2. `AGENTS.md`, `CONTEXT.md`, `docs/agents/DECISIONS.md`, `PATTERNS.md`, `OPEN-QUESTIONS.md`.
+2. `AGENTS.md`, `CONTEXT.md`, `docs/agents/DECISIONS.md`, `PATTERNS.md`, `CONTRACTS.md`,
+   `OPEN-QUESTIONS.md`; `ARCHITECTURE.md` for structural changes.
 3. UI work: `docs/design/DESIGN.md`, `docs/design/registry.yaml`, the screenshots of
    the screens you will touch.
 4. The code: find the **nearest existing example** of what you will build and read it
@@ -56,6 +57,7 @@ S | M | L — <what drives it>
 |---|---|---|---|
 | D-004 | … | … | confirm / wrong / outdated |
 | PATTERN-007 | … | … | confirm / wrong / outdated |
+| C-003 | … | this plan changes/relies on it; consumers: … | confirm / wrong / outdated |
 | Q-002 | … | still open, so X is out of scope | confirm / answered |
 
 ### Considered, not applied
@@ -64,6 +66,9 @@ S | M | L — <what drives it>
 ### Assumptions (no entry behind them)
 - <assumption> → becomes a Q- or a D- proposal if the user confirms it
 ```
+
+A change on one side of a contract lists the other side's files too (on disk), or
+says why none change.
 
 The knowledge list must be complete: a plan built on a wrong rule is wrong even if
 every step looks right.

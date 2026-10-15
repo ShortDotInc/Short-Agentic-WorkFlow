@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.1.0 — 2026-10-15
+
+- **Backfill** for existing repos: parallel read-only archaeologist agents
+  (structure, contracts, rules, history, docs lenses) mine the code, the full git
+  history and merged PRs, the docs and the local Claude memory.
+- **Assume from the code:** what the code consistently follows is recorded as
+  `approved` with evidence; only clashes go to review.
+- **Review UI:** a temporary local page (`templates/backfill/review-server.py` +
+  `review.html`, stdlib only, token-protected, 127.0.0.1) with one clash per card,
+  keyboard decisions (1–9, R, E, X, U), "Accept all recommendations", instant save,
+  auto-stop. `BACKFILL-REVIEW.md` keeps the record (decided, rejected).
+- **Contracts** (`C-` IDs) in `docs/agents/CONTRACTS.md`: the provider owns the
+  text, consumers link to it; both sides are checked when the other repo is on disk.
+- **Architecture** in `docs/agents/ARCHITECTURE.md`, generated from the code.
+- `/plan`, the planner and the reviewer load and check contracts.
+
 ## 1.0.0 — 2026-10-15
 
 First release.
