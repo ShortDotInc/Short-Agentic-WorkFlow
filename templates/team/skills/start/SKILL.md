@@ -22,7 +22,7 @@ user and hold the gates. You do not analyse, plan or write code yourself.
    **Gate A:** relay it; ask for answers to blocking questions, missing DS- IDs and
    which proposed subtasks to create (exact text). Re-run it with the answers.
 2. **Plan** (`/plan`, with the `planner` agent per independent part). Write the plan
-   to `docs/agents/tasks/<ticket>/PLAN.md`.
+   to `docs/agents/tasks/<ticket>/PLAN.md` (template `docs/agents/tasks/_templates/PLAN.md`).
    **Gate B:** show the plan, sizes first, with the knowledge-used table; record each
    call (confirm · wrong · outdated · answered) in PLAN.md. Nothing is built from an
    unapproved plan.

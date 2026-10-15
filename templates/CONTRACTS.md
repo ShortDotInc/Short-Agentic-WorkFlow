@@ -22,6 +22,7 @@
 - **Shape:** {{fields, types, required/optional, status or exit codes}}
 - **Rules:** {{versioning, compatibility, auth, limits}}
 - **Evidence:** {{path:line of the producer; consumer path:line if on disk}}
+- **Source:** {{code | docs | user}} · confidence {{high | medium | low}}
 
 ## Consumed
 

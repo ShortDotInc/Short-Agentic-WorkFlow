@@ -25,12 +25,27 @@ KINDS = {  # prefix: (main file, topic dir, required fields, allowed statuses)
     "C": ("CONTRACTS.md", "contracts", ["Status", "Interface", "Evidence"],
           ["approved", "proposed", "superseded-by"]),
     "Q": ("OPEN-QUESTIONS.md", "questions", ["Status"],
-          ["open", "answered", "deferred"]),
+          ["open", "investigating", "answered", "deferred"]),
 }
 SPLIT_AT = 150
 HEAD = re.compile(r"^(#{2,3}) (?:(?P<repo>[\w.-]+):)?(?P<id>(?:D|PATTERN|C|Q)-\d{3,})\s*·\s*(?P<title>.+?)\s*$")
 FIELD = re.compile(r"^- \*\*(?P<k>[A-Za-z ]+):\*\*\s*(?P<v>.*)$")
 LINK = re.compile(r"`(?P<repo>[\w.-]+):docs/agents/CONTRACTS\.md#(?P<id>C-\d{3,})`")
+ANY_ID = re.compile(r"(?<![\w:-])((?:D|PATTERN|C|Q)-\d{3,})(?![\w])")
+MDLINK = re.compile(r"\]\(([^)#\s]+)(?:#[^)]*)?\)")
+
+
+def find_repo(name):
+    """A sibling repo: ../<name>, or ../../*/<name> (repos grouped in folders)."""
+    parent = os.path.dirname(ROOT)
+    cands = [os.path.join(parent, name)]
+    gp = os.path.dirname(parent)
+    if os.path.isdir(gp):
+        cands += [os.path.join(gp, d, name) for d in sorted(os.listdir(gp))]
+    for c in cands:
+        if os.path.isdir(os.path.join(c, "docs", "agents")):
+            return c
+    return None
 
 
 def files_for(prefix):
@@ -116,9 +131,10 @@ def lint(fix=False):
     for p in files_for("C"):
         for n, line in enumerate(open(p, encoding="utf-8"), 1):
             for m in LINK.finditer(line):
-                other = os.path.join(os.path.dirname(ROOT), m["repo"], "docs", "agents")
-                if not os.path.isdir(other):
-                    continue  # provider not on disk: cannot check
+                repo_dir = find_repo(m["repo"])
+                if not repo_dir:
+                    continue  # provider not on disk (or not set up yet): cannot check
+                other = os.path.join(repo_dir, "docs", "agents")
                 ids = set()
                 for q in [os.path.join(other, "CONTRACTS.md")] + (
                         [os.path.join(other, "contracts", f) for f in os.listdir(os.path.join(other, "contracts"))]
@@ -127,6 +143,23 @@ def lint(fix=False):
                         ids |= {e["id"] for e in parse(q)[0] if not e["repo"]}
                 if m["id"] not in ids:
                     errors.append(f"{rel(p)}:{n} link {m['repo']}:{m['id']} not found in {m['repo']}/docs/agents")
+    # references to IDs that do not exist, and broken relative links
+    md = [os.path.join(ROOT, "AGENTS.md")] + [
+        os.path.join(dp, f) for dp, _, fs in os.walk(AG) for f in fs if f.endswith(".md")]
+    for p in md:
+        if not os.path.exists(p):
+            continue
+        for n, line in enumerate(open(p, encoding="utf-8"), 1):
+            if "{{" in line:
+                continue  # unfilled template line
+            for ref in ANY_ID.findall(line):
+                if ref not in all_ids:
+                    errors.append(f"{rel(p)}:{n} refers to {ref}, which does not exist")
+            for target in MDLINK.findall(line):
+                if re.match(r"^[a-z]+:", target):
+                    continue  # URL
+                if not os.path.exists(os.path.normpath(os.path.join(os.path.dirname(p), target))):
+                    errors.append(f"{rel(p)}:{n} broken link {target}")
     return errors, warns
 
 

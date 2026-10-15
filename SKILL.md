@@ -163,7 +163,8 @@ From the answers in `backfill-review.json` (or chat / the .md file):
 - Option or own answer → an `approved` entry (or a supersede of an old one). An
   answer that means "the code is wrong" → a code-fix suggestion in the report, never
   a silent code change.
-- `reject` → the item moves to "Rejected" in BACKFILL-REVIEW.md with the reason.
+- `reject` → the item moves to "Rejected" in BACKFILL-REVIEW.md with the reason, and
+  gets a line in `docs/agents/REJECTED.md` (so nobody re-proposes it).
 - Move decided items to "Decided" (R-ID · answer · date · resulting entry). Items left
   open stay open; the user can run "review the backfill" later to reopen the UI.
 - When no item is open, delete `backfill-review.json` (the UI is temporary); keep
@@ -187,6 +188,7 @@ AGENTS.md section 4 verbatim.
 | `docs/agents/ARCHITECTURE.md` | `templates/ARCHITECTURE.md` | from the `structure` lens |
 | `docs/agents/BACKFILL-REVIEW.md` | `templates/BACKFILL-REVIEW.md` | only if there are clashes (2.4) |
 | `docs/agents/README.md` | `templates/README.agents.md` | the one-page guide for people |
+| `docs/agents/REJECTED.md` | `templates/REJECTED.md` | rejected proposals and findings; never re-proposed |
 | `docs/agents/tools/ledger-lint.py` | `templates/tools/ledger-lint.py` | as is; run it with `--fix` after writing the ledger |
 | `.claude/skills/plan/SKILL.md` | `templates/skills/plan/SKILL.md` | as is |
 | `.claude/skills/build/SKILL.md` | `templates/skills/build/SKILL.md` | as is; remove the visual step if not visual |
@@ -227,6 +229,7 @@ addon (tickets, PRs, reviews) to this repo?" Default: no. A re-run on a repo tha
 already has the `graffino-agentic:team` block updates it without asking again.
 
 If yes, ask in one go for the settings in `templates/team/TEAM.md`: ticket prefix,
+manual-test paths, waiver person and baseline date (if manual tests = yes),
 tracker (e.g. a ClickUp list), backlog for new tickets, ticket URL pattern, base
 branch, who merges, ready-for-review notice, team rules doc (optional), manual tests
 (yes/no), CI checks (yes/no). **CI checks: ask which runner** (a Graffino
@@ -239,7 +242,9 @@ Then write, filling `{{…}}` from the answers:
 | `AGENTS.md` | append `templates/team/AGENTS.team.md` (its own marked block) after the base block; `{{MANUAL_TESTS_RULE}}` = "Manual tests: anything only a person can prove gets an entry in `docs/agents/MANUAL-TESTS.md`; only the person who ran it reports the result." or empty |
 | `docs/agents/TEAM.md` | `templates/team/TEAM.md` |
 | `docs/agents/STATE.md` | `templates/team/STATE.md` (what exists, tickets in flight, recently done; ≤ 150 lines) |
-| `docs/agents/tasks/_templates/` | `OVERVIEW.md`, `log.md`, `TESTS.md` |
+| `docs/agents/tasks/_templates/` | `OVERVIEW.md`, `log.md`, `TESTS.md`, `PLAN.md` |
+| `docs/agents/README.md` | append `templates/team/README.team.md` (its own marked block) |
+| `.github/manual-test-paths` | the globs from the answer (only if manual tests = yes) |
 | `docs/agents/MANUAL-TESTS.md` | `templates/team/MANUAL-TESTS.md` (only if manual tests = yes) |
 | `.github/pull_request_template.md` | `templates/team/pull_request_template.md` (merge with an existing one: keep its extra sections) |
 | `.claude/agents/` | `product-owner.md`, `test-author.md`, `reviewer.md` |
@@ -258,7 +263,8 @@ Test the CI script once locally on the current branch before the commit
    hard-coded value outside the token source as a finding (`path:line`), don't fix it.
 3. List screens and shared components with their source file; give each a DS- ID
    `DS-<repo-short>-<name>` in `registry.yaml`, `status: implemented`.
-4. **Design board** (optional): if the user has a Claude Design board for this repo,
+4. **Design board** (optional; artboard file names on the board are unique and say what
+   they show, e.g. `CommandsList`, never `Main2`): if the user has a Claude Design board for this repo,
    put its link in DESIGN.md → Source. "Pull the design" then copies it (DESIGN.md →
    Pulling from the board).
 5. Write the screenshot command for this stack into AGENTS.md section 2 (for
@@ -305,7 +311,7 @@ Read the version in the markers. Replace each marked block with the current
 template, keep repo text, keep all ledger entries (never renumber, never delete;
 superseded entries stay). Add files that are new in this version (for example
 CONTRACTS.md and ARCHITECTURE.md in 1.1; `docs/agents/README.md` and
-`docs/agents/tools/ledger-lint.py` in 1.2, then run the lint with `--fix` and split
+`docs/agents/tools/ledger-lint.py` and `REJECTED.md` in 1.2, then run the lint with `--fix` and split
 ledgers above ~150 lines). Report what changed.
 
 A repo set up **before the backfill existed** (no `CONTRACTS.md`): run step 2 now.

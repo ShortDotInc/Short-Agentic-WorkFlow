@@ -4,8 +4,7 @@ A Claude Code skill that installs a small, self-contained agentic working system
 any code repository, new or existing. Every file it writes lives in that repository;
 there is no shared rules folder and no separate docs repo.
 
-Adapted from the FiscalLink-Docs system, simplified: no tickets, no PRs, no reviews
-by default. An optional **team addon** brings them back.
+The base has no tickets, no PRs and no reviews by default. An optional **team addon** brings them back.
 
 ## What it adds to a repo
 

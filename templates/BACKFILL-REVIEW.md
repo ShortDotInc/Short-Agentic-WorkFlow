@@ -28,4 +28,4 @@ Backfill run: {{YYYY-MM-DD}} · clashes: {{n}} · entries recorded without revie
 <!-- R-ID · answer · date · resulting entry (D-/PATTERN-/C-) or code-fix suggestion -->
 
 ## Rejected
-<!-- R-ID · finding · why it was rejected · date -->
+<!-- R-ID · finding · why it was rejected · date — also added to docs/agents/REJECTED.md -->

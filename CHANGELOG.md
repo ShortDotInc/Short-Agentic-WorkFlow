@@ -17,6 +17,20 @@
   lines; lint-checked), read by `/start`, updated every session.
 - **Backfill:** docs that lag behind the code are fixed, not sent to review; only a
   doc that may state the intended behaviour is a clash.
+- **Ledger entries:** `Source:` + confidence, `Owner note:`; questions get
+  `investigating` and `Recorded as:`.
+- **`docs/agents/REJECTED.md`:** rejected proposals and backfill findings, never
+  re-proposed without new evidence; PROPOSAL shape names the supersede.
+- **Rule:** cite past work as "replicate" (approved patterns only) or "for awareness
+  only"; history is not a template.
+- **Lint:** references to IDs that do not exist, broken relative links, sibling
+  repos found in `../` and `../../*/`.
+- **Team addon:** `PLAN.md` ticket template with the gate B record; one ticket folder
+  at a time; `git fetch` before taking an ID (base branch wins a collision); full
+  manual-test rules (queue + history, statuses, waiver person, baseline, regression
+  runs, environments); `.github/manual-test-paths`; onboarding block for people;
+  CI runs the ledger lint, checks manual-test paths, and reports each release's
+  tickets and open manual tests on a tag.
 
 ## 1.1.0 — 2026-10-15
 

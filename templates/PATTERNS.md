@@ -16,4 +16,5 @@
 - **How:** {{the steps or shape, short}}
 - **Example:** {{path:line of the best existing instance}}
 - **Why:** {{what goes wrong without it}}
+- **Source:** {{code | git | pr | docs | memory | user}} · confidence {{high | medium | low}}
 - **Confirmed:** {{YYYY-MM-DD, optional}}

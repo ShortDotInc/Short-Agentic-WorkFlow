@@ -31,7 +31,10 @@ PROPOSAL: <add-decision | change | supersede | promote | delete>
 - Proposed: <the new rule>
 - Why now: <what changed>
 - Impact: <files that follow the old rule>
+- If approved: <old ID> → superseded-by <new ID> (kept, not deleted)
 ```
+Before you propose, check `docs/agents/REJECTED.md`: never re-propose a rejected item
+without new evidence. A rejected proposal is added there with the reason.
 
 ### Hard rules
 - Build only from `approved` entries. Unanswered means out of scope: record a Q-,
@@ -41,6 +44,8 @@ PROPOSAL: <add-decision | change | supersede | promote | delete>
   to make code pass; an assertion you think is wrong goes to the user.
 - Never write a secret, token, password or personal data into a file, commit or log.
 - Never push, tag, release, or deploy without the user's go for that action.
+- When you cite past work, label the intent: **replicate** (only for an `approved`
+  pattern) or **for awareness only**. History is not a template.
 - The code wins over any document. When they disagree, say so and fix the document.
 - Report honestly: a failed check is reported with its output; a skipped step is
   named with its reason.
