@@ -27,7 +27,7 @@ Local examples
   PREFIX=ABC python3 .github/scripts/clickup-sync.py pr-link --branch feat/x-ABC-12 \
     --pr-url https://github.com/org/repo/pull/7 --pr-title "ABC-12 - feat: x"
 """
-import argparse, json, os, re, subprocess, sys, time, urllib.error, urllib.request
+import argparse, hashlib, json, os, re, subprocess, sys, time, urllib.error, urllib.request
 
 ROOT = os.getcwd()
 CFG_PATH = os.path.join(ROOT, "docs", "agents", "clickup.json")
@@ -35,7 +35,6 @@ API = os.environ.get("CLICKUP_API_BASE", "https://api.clickup.com").rstrip("/")
 LIVE = os.environ.get("AUTOMATION_LIVE", "").lower() == "true"
 PREFIX = os.environ.get("PREFIX", "{{PREFIX}}")
 TICKET = re.compile(rf"\b{re.escape(PREFIX)}-\d+\b")
-EDIT_SKEW_MS = 5000
 
 
 def cfg():
@@ -172,11 +171,34 @@ def doc_files():
 def page_body(path):
     text = open(os.path.join(ROOT, path), encoding="utf-8").read()
     text = re.sub(r"<!-- graffino-agentic[^>]*-->\n?", "", text)
-    sha = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
     repo = os.path.basename(ROOT)
     title = next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), path)
-    head = f"> Generated from `{repo}:{path}` @ `{sha}`. **Edit in the repo, comment here.** A change made on this page is never copied back.\n\n"
+    # No commit hash in the header: the page changes only when its file changes.
+    head = (f"> Generated from `{repo}:{path}`. **Edit in the repo, comment here.** "
+            f"A change made on this page is never copied back.\n\n")
     return title, head + text
+
+
+def content_hash(name, content):
+    return hashlib.sha256((name + "\n" + content).encode("utf-8")).hexdigest()
+
+
+# ClickUp's editor rewrites a page when someone opens it (adds or drops links, drops list
+# markers, escapes punctuation, changes spacing). Only a change to the words is an edit.
+_LINK = re.compile(r"\[(`[^`\n]*`|[^\]\n]*)\]\([^)\s]*\)")
+_BULLET = re.compile(r"^((?:\s*>)*)\s*[*+-]\s+")
+_FENCE = re.compile(r"^```\w*$")
+_ESCAPE = re.compile(r"\\([\\`*_{}\[\]()#+\-.!|<>])")
+
+
+def remote_hash(page):
+    lines = []
+    for line in ((page or {}).get("content") or "").strip().splitlines():
+        line = _ESCAPE.sub(r"\1", _LINK.sub(r"\1", _BULLET.sub(r"\1", line)))
+        line = _FENCE.sub("```", re.sub(r"[\s*_]+", "", line))
+        if line:
+            lines.append(line)
+    return hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest()
 
 
 def publish_docs(c, force=()):
@@ -185,41 +207,61 @@ def publish_docs(c, force=()):
         sys.exit("docs/agents/clickup.json needs workspace_id and doc_id")
     pages = c.setdefault("pages", {})
     base = f"/api/v3/workspaces/{ws}/docs/{doc}/pages"
-    skipped = []
+    rep = {"created": [], "updated": [], "unchanged": [], "edited": [], "parent_missing": []}
     for path, parent in doc_files():
         title, body = page_body(path)
+        h = content_hash(title, body)
         entry = pages.get(path)
-        parent_id = (pages.get(parent) or {}).get("page_id") if parent else None
-        if entry:
-            remote = call("GET", f"{base}/{entry['page_id']}?content_format=text/md")
-            updated = int((remote or {}).get("date_updated") or 0)
-            if path not in force and remote is not None \
-                    and updated > int(entry.get("published_at", 0)) + EDIT_SKEW_MS:
-                skipped.append(path)
-                print(f"SKIP {path}: the ClickUp page was edited after the last publish — move that "
-                      f"change into the repo, then run: publish-docs --force {path}")
+        if entry and entry.get("content_sha256") == h and path not in force:
+            rep["unchanged"].append(path)
+            continue
+        if not entry or not entry.get("page_id"):
+            req = {"name": title, "content": body, "content_format": "text/md"}
+            if parent:
+                parent_id = (pages.get(parent) or {}).get("page_id")
+                if not parent_id and LIVE:
+                    rep["parent_missing"].append(path)
+                    continue
+                if parent_id:
+                    req["parent_page_id"] = parent_id
+            res = call("POST", base, req, write=True) or {}
+            log(f"created {path}")
+            rep["created"].append(path)
+            if not LIVE:
                 continue
-            call("PUT", f"{base}/{entry['page_id']}", {"name": title, "content": body,
+            page_id = str(res.get("id") or "")
+            if not page_id:
+                sys.exit(f"create page {path}: no id in the response")
+            pages[path] = {"page_id": page_id}
+            save_cfg(c)  # saved now, so a later failure cannot create a duplicate page
+        else:
+            page_id = entry["page_id"]
+            remote = call("GET", f"{base}/{page_id}?content_format=text/md")
+            stored = entry.get("clickup_content_sha256")
+            if remote is not None and stored and remote_hash(remote) != stored and path not in force:
+                rep["edited"].append(path)
+                print(f"SKIP {path}: edited in ClickUp since the last publish — move that change into "
+                      f"the repo, then run: publish-docs --force {path}")
+                continue
+            call("PUT", f"{base}/{page_id}", {"name": title, "content": body,
                  "content_edit_mode": "replace", "content_format": "text/md"}, write=True)
             log(f"updated {path}")
-            page_id = entry["page_id"]
-        else:
-            req = {"name": title, "content": body, "content_format": "text/md"}
-            if parent_id:
-                req["parent_page_id"] = parent_id
-            res = call("POST", base, req, write=True) or {}
-            page_id = res.get("id")
-            log(f"created {path}")
-            if not page_id:
-                continue  # dry run
-        if LIVE:
-            after = call("GET", f"{base}/{page_id}?content_format=text/md") or {}
-            pages[path] = {"page_id": page_id, "published_at": int(after.get("date_updated") or time.time() * 1000)}
-    if LIVE:
+            rep["updated"].append(path)
+            if not LIVE:
+                continue
+        after = call("GET", f"{base}/{page_id}?content_format=text/md") or {}
+        pages[path] = {"page_id": page_id, "content_sha256": h, "clickup_content_sha256": remote_hash(after)}
         save_cfg(c)
+    missing = sorted(k for k in pages if k not in {p for p, _ in doc_files()})
+    print(f"{len(rep['created'])} created · {len(rep['updated'])} updated · {len(rep['unchanged'])} unchanged")
+    for k, label in (("edited", "edited in ClickUp, skipped"), ("parent_missing", "parent page missing, skipped")):
+        if rep[k]:
+            print(f"{label}: {', '.join(rep[k])}")
+    if missing:
+        print(f"in clickup.json but no longer in the repo (delete those pages by hand): {', '.join(missing)}")
+    if LIVE and (rep["created"] or rep["updated"]):
         print("docs/agents/clickup.json updated — commit it")
-    print(f"done; skipped {len(skipped)} page(s) edited in ClickUp" if skipped else "done")
-    return 1 if skipped else 0
+    return 1 if rep["edited"] else 0
 
 
 def main():
