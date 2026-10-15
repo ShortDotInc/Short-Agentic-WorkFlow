@@ -12,7 +12,7 @@ user and hold the gates. You do not analyse, plan or write code yourself.
 ## 0. Intake
 1. A ticket ID is required (prefix in `docs/agents/TEAM.md`). Missing: stop and ask.
 2. `git fetch --all --prune`, `git pull --ff-only`.
-3. `docs/agents/tasks/<ticket>/` exists: read OVERVIEW ("Resume here") and the newest
+3. Read `docs/agents/STATE.md`. `docs/agents/tasks/<ticket>/` exists: read OVERVIEW ("Resume here") and the newest
    log, and offer to resume at that phase.
 4. "What happened on <ticket>?": answer from that folder alone, then stop.
 5. "fast" on a ticket that is not size S: say so and ask whether to use the full lane.
@@ -22,7 +22,7 @@ user and hold the gates. You do not analyse, plan or write code yourself.
    **Gate A:** relay it; ask for answers to blocking questions, missing DS- IDs and
    which proposed subtasks to create (exact text). Re-run it with the answers.
 2. **Plan** (`/plan`, with the `planner` agent per independent part). Write the plan
-   to `docs/agents/tasks/<ticket>/PLAN.md`.
+   to `docs/agents/tasks/<ticket>/PLAN.md` (template `docs/agents/tasks/_templates/PLAN.md`).
    **Gate B:** show the plan, sizes first, with the knowledge-used table; record each
    call (confirm · wrong · outdated · answered) in PLAN.md. Nothing is built from an
    unapproved plan.
@@ -33,8 +33,10 @@ user and hold the gates. You do not analyse, plan or write code yourself.
    uncovered case → test author first. **At most 2 rounds**, then bring it to the user.
 6. **Gate C:** report what was built, tests (added · passing · assertions changed by
    the builder: must be 0), deviations, the verdict, files, branch and PR, manual
-   tests. When the user says so: mark the PR ready (checks green), send the
-   ready-for-review notice from TEAM.md, move the ticket to in review. Merging is
+   tests. When the user says so: mark the PR ready (checks green). With the Slack
+   and ClickUp addons, CI then posts the notice and moves the ticket; check those runs
+   instead of doing it by hand. Without them: send the ready-for-review notice from
+   TEAM.md and move the ticket to in review. Merging is
    the user's.
 
 ## Fast lane (size S)
@@ -44,8 +46,8 @@ failure → full lane) → **gate C**.
 
 ## Always
 - When the intended behaviour changes: test author first again, then build, then review.
-- Every session ends written down: `log_YYYY-MM-DD_HHMM.md` and OVERVIEW updated,
-  even when the pipeline stops at a gate.
+- Every session ends written down: `log_YYYY-MM-DD_HHMM.md`, OVERVIEW and the
+  ticket's `STATE.md` row updated, even when the pipeline stops at a gate.
 - Open questions go to `docs/agents/OPEN-QUESTIONS.md`; new practices become
   candidate patterns; follow-up tickets are drafted for the user's OK.
 <!-- graffino-agentic:team:end -->

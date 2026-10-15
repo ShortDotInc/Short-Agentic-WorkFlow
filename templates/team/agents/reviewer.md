@@ -28,6 +28,8 @@ The diff is the truth. Where a report and the diff disagree, that is a finding.
   author's commits). A case no test covers → "test author adds a test first".
 - **Decisions and patterns:** the code obeys the decisions and follows the approved
   patterns it cites; no candidate copied.
+- **Contracts:** every C- the diff touches; both sides changed together (or the plan
+  says why not); ARCHITECTURE.md still true.
 - **UI:** tokens only; states covered; screenshots light and dark exist and match.
 - **Manual tests:** every change only a person can prove has an entry with steps.
 - **Git rules:** branch name, commit titles, draft PR with the five sections, link
