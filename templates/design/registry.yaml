@@ -1,0 +1,10 @@
+# docs/design/registry.yaml — every screen and shared component, by DS- ID.
+# Plans and commits cite the ID. kind: foundation | component | screen
+# status: draft | approved | implemented | deprecated (never delete an entry; tasks may cite it)
+designs:
+  - id: DS-{{short}}-{{name}}
+    kind: screen
+    source: {{path of the code that renders it}}
+    screenshots: [screens/DS-{{short}}-{{name}}.light.png, screens/DS-{{short}}-{{name}}.dark.png]
+    design_ref: {{board artboard URL | none}}
+    status: implemented
