@@ -17,7 +17,7 @@ Text between `<!-- graffino-agentic:begin vN -->` and `<!-- graffino-agentic:end
 owned by this skill; text outside the markers belongs to the repo and is never
 removed.
 
-Current version: **v1** (release 1.1.0; the markers carry the major version only).
+Current version: **v1** (release 1.2.0; the markers carry the major version only).
 
 ## 0. Preconditions
 
@@ -85,8 +85,15 @@ Small repo (under ~50 source files): one agent with all lenses is enough.
 | Unknown, and it blocks a decision | Q- | open |
 | **A clash** (below) | review item | — |
 
+**Docs that lag behind the code are not a clash.** The code wins (AGENTS.md hard
+rule): when the code is consistent and git history shows the change was deliberate,
+record the rule from the code and fix the doc (README, docs/, comments, Makefile
+messages) in the same setup commit. List each doc fix in the report.
+
 **A clash** is any of:
-1. A written rule (docs, memory, comment, README) that the code does not follow.
+1. A written rule (docs, memory, comment, README) that the code does not follow,
+   **and** the doc may state the intended behaviour (the code looks like a bug, or
+   no commit explains the change).
 2. Two or more ways of doing the same thing in the code, with no clear current one
    (the newest way is not clearly the intended one).
 3. Two findings that contradict each other.
@@ -179,6 +186,8 @@ AGENTS.md section 4 verbatim.
 | `docs/agents/CONTRACTS.md` | `templates/CONTRACTS.md` | provided, consumed and external interfaces (2.3) |
 | `docs/agents/ARCHITECTURE.md` | `templates/ARCHITECTURE.md` | from the `structure` lens |
 | `docs/agents/BACKFILL-REVIEW.md` | `templates/BACKFILL-REVIEW.md` | only if there are clashes (2.4) |
+| `docs/agents/README.md` | `templates/README.agents.md` | the one-page guide for people |
+| `docs/agents/tools/ledger-lint.py` | `templates/tools/ledger-lint.py` | as is; run it with `--fix` after writing the ledger |
 | `.claude/skills/plan/SKILL.md` | `templates/skills/plan/SKILL.md` | as is |
 | `.claude/skills/build/SKILL.md` | `templates/skills/build/SKILL.md` | as is; remove the visual step if not visual |
 | `.claude/agents/planner.md` | `templates/agents/planner.md` | as is |
@@ -195,6 +204,12 @@ AGENTS.md section 4 verbatim.
 Existing file: merge. Replace only the marked block; keep everything outside it. A
 file without markers: add the marked block at the top and keep the old content
 below it, reorganized only where it duplicates the block.
+
+**Split large ledgers.** When a ledger file passes ~150 lines (the lint warns),
+move its entries into topic files `docs/agents/<decisions|patterns|contracts|questions>/<topic>.md`
+(one topic per area, kebab-case, entries keep their IDs) and keep only the index in
+the main file. `ledger-lint.py --fix` rebuilds the index grouped by topic. Agents load
+the indexes and open a topic file before they rely on an entry in it.
 
 Write every file in plain, short English: active voice, one rule per bullet, at most
 ~20 words per sentence. AGENTS.md stays under ~150 lines; detail goes in the ledger.
@@ -223,6 +238,7 @@ Then write, filling `{{…}}` from the answers:
 |---|---|
 | `AGENTS.md` | append `templates/team/AGENTS.team.md` (its own marked block) after the base block; `{{MANUAL_TESTS_RULE}}` = "Manual tests: anything only a person can prove gets an entry in `docs/agents/MANUAL-TESTS.md`; only the person who ran it reports the result." or empty |
 | `docs/agents/TEAM.md` | `templates/team/TEAM.md` |
+| `docs/agents/STATE.md` | `templates/team/STATE.md` (what exists, tickets in flight, recently done; ≤ 150 lines) |
 | `docs/agents/tasks/_templates/` | `OVERVIEW.md`, `log.md`, `TESTS.md` |
 | `docs/agents/MANUAL-TESTS.md` | `templates/team/MANUAL-TESTS.md` (only if manual tests = yes) |
 | `.github/pull_request_template.md` | `templates/team/pull_request_template.md` (merge with an existing one: keep its extra sections) |
@@ -242,7 +258,10 @@ Test the CI script once locally on the current branch before the commit
    hard-coded value outside the token source as a finding (`path:line`), don't fix it.
 3. List screens and shared components with their source file; give each a DS- ID
    `DS-<repo-short>-<name>` in `registry.yaml`, `status: implemented`.
-4. Write the screenshot command for this stack into AGENTS.md section 2 (for
+4. **Design board** (optional): if the user has a Claude Design board for this repo,
+   put its link in DESIGN.md → Source. "Pull the design" then copies it (DESIGN.md →
+   Pulling from the board).
+5. Write the screenshot command for this stack into AGENTS.md section 2 (for
    example a headless browser for a web UI, `screencapture -l <window id>` for a Mac
    app, a Playwright script for a Laravel/Filament panel). If none can run here, add
    Q- "how do we screenshot this app" instead of inventing one.
@@ -251,7 +270,9 @@ Test the CI script once locally on the current branch before the commit
 
 - Every command written into AGENTS.md section 2 was run once, or is marked
   "not run: <reason>".
-- Every ledger entry has evidence.
+- `python3 docs/agents/tools/ledger-lint.py --fix`, then without `--fix`: it passes
+  (unique IDs, required fields incl. evidence, indexes in sync, superseded-by targets
+  exist, consumed-contract links resolve where the provider repo is on disk).
 - The `.claude/` files parse (frontmatter present, names unique).
 - `git status` shows only the files this skill created or changed.
 
@@ -264,7 +285,8 @@ Show the user, before any commit:
    when under ~30 entries, otherwise the index files are the list.
 3. **Review page:** the number of clashes, each in one line with your
    recommendation, and how to answer. Or "no clashes".
-4. Facts moved from memory, and facts dropped as stale (with why).
+4. Facts moved from memory, facts dropped as stale (with why), and the doc fixes
+   made because the docs lagged behind the code.
 5. Visual apps: token summary, number of DS- entries, hard-coded value findings.
 6. Commands that failed or were not run.
 7. Team addon: added or not; if added, the settings used.
@@ -282,7 +304,9 @@ On the user's go:
 Read the version in the markers. Replace each marked block with the current
 template, keep repo text, keep all ledger entries (never renumber, never delete;
 superseded entries stay). Add files that are new in this version (for example
-CONTRACTS.md and ARCHITECTURE.md in 1.1). Report what changed.
+CONTRACTS.md and ARCHITECTURE.md in 1.1; `docs/agents/README.md` and
+`docs/agents/tools/ledger-lint.py` in 1.2, then run the lint with `--fix` and split
+ledgers above ~150 lines). Report what changed.
 
 A repo set up **before the backfill existed** (no `CONTRACTS.md`): run step 2 now.
 Existing entries keep their IDs; new findings continue the sequences; a new finding

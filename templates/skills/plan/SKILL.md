@@ -70,6 +70,11 @@ S | M | L — <what drives it>
 A change on one side of a contract lists the other side's files too (on disk), or
 says why none change.
 
+Entries with a `Confirmed:` date collapse into one line ("9 entries confirmed before,
+unchanged: D-002, D-004, …"); show only new, unconfirmed or flagged entries in full.
+After the gate, write `Confirmed: <today>` on every entry the user confirmed, then
+run the ledger lint.
+
 The knowledge list must be complete: a plan built on a wrong rule is wrong even if
 every step looks right.
 

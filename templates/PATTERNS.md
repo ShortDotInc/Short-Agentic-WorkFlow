@@ -16,3 +16,4 @@
 - **How:** {{the steps or shape, short}}
 - **Example:** {{path:line of the best existing instance}}
 - **Why:** {{what goes wrong without it}}
+- **Confirmed:** {{YYYY-MM-DD, optional}}

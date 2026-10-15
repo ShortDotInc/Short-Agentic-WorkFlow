@@ -18,3 +18,4 @@
 - **Why:** {{the reason; the incident or constraint behind it}}
 - **Rejected:** {{alternatives considered and why not}}
 - **Evidence:** {{path:line, commit hash}}
+- **Confirmed:** {{YYYY-MM-DD — set when the user confirms it in a plan; removed on any edit}}

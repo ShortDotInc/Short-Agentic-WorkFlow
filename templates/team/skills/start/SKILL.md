@@ -12,7 +12,7 @@ user and hold the gates. You do not analyse, plan or write code yourself.
 ## 0. Intake
 1. A ticket ID is required (prefix in `docs/agents/TEAM.md`). Missing: stop and ask.
 2. `git fetch --all --prune`, `git pull --ff-only`.
-3. `docs/agents/tasks/<ticket>/` exists: read OVERVIEW ("Resume here") and the newest
+3. Read `docs/agents/STATE.md`. `docs/agents/tasks/<ticket>/` exists: read OVERVIEW ("Resume here") and the newest
    log, and offer to resume at that phase.
 4. "What happened on <ticket>?": answer from that folder alone, then stop.
 5. "fast" on a ticket that is not size S: say so and ask whether to use the full lane.
@@ -44,8 +44,8 @@ failure → full lane) → **gate C**.
 
 ## Always
 - When the intended behaviour changes: test author first again, then build, then review.
-- Every session ends written down: `log_YYYY-MM-DD_HHMM.md` and OVERVIEW updated,
-  even when the pipeline stops at a gate.
+- Every session ends written down: `log_YYYY-MM-DD_HHMM.md`, OVERVIEW and the
+  ticket's `STATE.md` row updated, even when the pipeline stops at a gate.
 - Open questions go to `docs/agents/OPEN-QUESTIONS.md`; new practices become
   candidate patterns; follow-up tickets are drafted for the user's OK.
 <!-- graffino-agentic:team:end -->

@@ -13,10 +13,12 @@ by default. An optional **team addon** brings them back.
 |---|---|
 | Rules the agent always loads | `AGENTS.md` (+ `CLAUDE.md` = `@AGENTS.md`), `CONTEXT.md` (project vocabulary) |
 | Knowledge ledger with a gate | `docs/agents/DECISIONS.md`, `PATTERNS.md`, `CONTRACTS.md` (C- IDs), `OPEN-QUESTIONS.md`, `ARCHITECTURE.md` |
+| Ledger tooling | `docs/agents/tools/ledger-lint.py` (checks IDs, fields, links; rebuilds indexes; `--next D`); index + topic files above ~150 lines; `Confirmed:` dates collapse in plans |
+| Guide for people | `docs/agents/README.md` |
 | Backfill (existing repos) | read-only agents mine code, git history, PRs, docs and memory; clashes only go to a temporary review UI; record in `BACKFILL-REVIEW.md` |
 | Plan, then build (tests first) | `.claude/skills/plan`, `.claude/skills/build`, `.claude/agents/planner.md`, `builder.md` |
 | Visual apps: design guardrails | `docs/design/DESIGN.md` (rules, procedure, real tokens), `registry.yaml` (DS- IDs), `screens/` |
-| Optional team addon | ticket-first work, ticket branches and commit titles, draft PRs (5-section template), `/start <ticket>` pipeline (product owner → plan → test author → build → reviewer, 3 user gates), a journal per ticket, manual tests, a self-contained CI check |
+| Optional team addon | `STATE.md` (tickets in flight), ticket-first work, ticket branches and commit titles, draft PRs (5-section template), `/start <ticket>` pipeline (product owner → plan → test author → build → reviewer, 3 user gates), a journal per ticket, manual tests, a self-contained CI check |
 
 The skill asks every time whether to add the team addon. For the CI check it asks
 which runner to use.

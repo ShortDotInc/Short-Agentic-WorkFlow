@@ -6,7 +6,8 @@
 **Before any work:** `git fetch --all --prune`, then `git pull --ff-only`. Stop on a
 non-fast-forward or on uncommitted changes you did not make.
 
-**Always load:** `docs/agents/DECISIONS.md`, `docs/agents/PATTERNS.md`,
+**Always load** (indexes; open the entry, or its topic file, before you rely on it):
+`docs/agents/DECISIONS.md`, `docs/agents/PATTERNS.md`,
 `docs/agents/CONTRACTS.md`, `docs/agents/OPEN-QUESTIONS.md`, `CONTEXT.md`. Load
 `docs/agents/ARCHITECTURE.md` before structural work. UI work also loads
 `docs/design/DESIGN.md` and `docs/design/registry.yaml`.
@@ -49,6 +50,10 @@ PROPOSAL: <add-decision | change | supersede | promote | delete>
 - A provided contract (C-) lives here only; consumers link to it. Changing one is a
   PROPOSAL, and the plan names the consumer files too.
 - Superseded entries stay (`status: superseded-by <ID>`) so old code stays explainable.
+- After any ledger change: `python3 docs/agents/tools/ledger-lint.py --fix` (next free
+  ID: `--next D`). It must pass.
+- **Confirmed:** when the user confirms an entry in a plan, set `- **Confirmed:** <date>`
+  on it. Any edit to an entry removes its Confirmed line.
 - A new reusable practice becomes a `candidate` pattern in the same session.
 - A settled constraint becomes a decision PROPOSAL in the same session.
 <!-- graffino-agentic:end -->

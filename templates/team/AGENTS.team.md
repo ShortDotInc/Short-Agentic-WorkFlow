@@ -38,5 +38,7 @@ Every session ends written down, finished or not, in
 `docs/agents/tasks/{{PREFIX}}-<id>/`: `OVERVIEW.md` ("Resume here", status,
 manifest) and `log_YYYY-MM-DD_HHMM.md`. Templates: `docs/agents/tasks/_templates/`.
 "What happened on {{PREFIX}}-123?" is answered from that folder alone.
+`docs/agents/STATE.md` holds one row per ticket in flight and the last 10 done;
+every session that starts, pauses or finishes a ticket updates its row.
 {{MANUAL_TESTS_RULE}}
 <!-- graffino-agentic:team:end -->

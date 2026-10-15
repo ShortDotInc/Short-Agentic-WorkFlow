@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.2.0 — 2026-10-15
+
+- **Ledger lint** (`docs/agents/tools/ledger-lint.py`, copied into each repo):
+  unique IDs per kind, required fields incl. evidence, valid statuses,
+  `superseded-by` targets exist, indexes in sync (`--fix` rebuilds them),
+  consumed-contract links resolve against provider repos on disk, `--next D`.
+- **Index + topic files:** ledgers above ~150 lines split into
+  `docs/agents/<kind>/<topic>.md`; the main file keeps the index, grouped by topic.
+- **Confirmed dates:** a user's "confirm" in a plan sets `Confirmed:` on the entry;
+  `/plan` collapses unchanged confirmed entries; any edit removes the date.
+- **Guide for people:** `docs/agents/README.md`, one page.
+- **Design board pull:** "pull the design" copies a Claude Design board into
+  `docs/design/board/` and updates the DS- registry.
+- **Team addon:** `docs/agents/STATE.md` (tickets in flight, recently done, ≤ 150
+  lines; lint-checked), read by `/start`, updated every session.
+- **Backfill:** docs that lag behind the code are fixed, not sent to review; only a
+  doc that may state the intended behaviour is a clash.
+
 ## 1.1.0 — 2026-10-15
 
 - **Backfill** for existing repos: parallel read-only archaeologist agents
