@@ -31,7 +31,7 @@ SPLIT_AT = 150
 HEAD = re.compile(r"^(#{2,3}) (?:(?P<repo>[\w.-]+):)?(?P<id>(?:D|PATTERN|C|Q)-\d{3,})\s*·\s*(?P<title>.+?)\s*$")
 FIELD = re.compile(r"^- \*\*(?P<k>[A-Za-z ]+):\*\*\s*(?P<v>.*)$")
 LINK = re.compile(r"`(?P<repo>[\w.-]+):docs/agents/CONTRACTS\.md#(?P<id>C-\d{3,})`")
-ANY_ID = re.compile(r"(?<![\w:-])((?:D|PATTERN|C|Q)-\d{3,})(?![\w])")
+ANY_ID = re.compile(r"(?<![\w:#-])((?:D|PATTERN|C|Q)-\d{3,})(?![\w])")
 MDLINK = re.compile(r"\]\(([^)#\s]+)(?:#[^)]*)?\)")
 
 

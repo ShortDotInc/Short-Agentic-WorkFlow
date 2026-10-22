@@ -19,6 +19,9 @@ findings; the caller writes the files.
   it, write `inferred: <your reading>`.
 - Never copy secret values, tokens, personal data or real business figures into a
   finding. Name the variable or field, never its value.
+- Never print process lists with arguments (`ps aux`, `pgrep -lf`) or environment
+  dumps: agents such as fleetd pass enroll secrets and tokens on the command line or
+  in the environment, and the output lands in the transcript.
 - Prefer fewer, sharper findings over many vague ones. Skip what any developer of
   this stack already knows (generic framework behaviour) unless this repo departs
   from it.
