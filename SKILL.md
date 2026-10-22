@@ -17,7 +17,7 @@ Text between `<!-- graffino-agentic:begin vN -->` and `<!-- graffino-agentic:end
 owned by this skill; text outside the markers belongs to the repo and is never
 removed.
 
-Current version: **v1** (release 1.3.0; the markers carry the major version only).
+Current version: **v1** (release 1.3.1; the markers carry the major version only).
 
 ## 0. Preconditions
 
@@ -194,7 +194,7 @@ AGENTS.md section 4 verbatim.
 | `.claude/skills/plan/SKILL.md` | `templates/skills/plan/SKILL.md` | as is; not visual: remove the UI load step and the "Design (UI only)" section |
 | `.claude/skills/build/SKILL.md` | `templates/skills/build/SKILL.md` | as is; not visual: remove step 4 (UI changes), renumber, and drop "screenshots" from the description and report |
 | `.claude/agents/planner.md` | `templates/agents/planner.md` | as is; not visual: drop the `docs/design/` load |
-| `.claude/agents/builder.md` | `templates/agents/builder.md` | as is; not visual: drop "screenshots for UI" |
+| `.claude/agents/builder.md` | `templates/agents/builder.md` | as is; not visual: drop "screenshots for UI" and change "steps 2–6" to "steps 2–5" (the build skill lost its UI step) |
 
 **Visual apps also get:**
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1 — 2026-10-23
+
+- **Non-visual builder agent:** the note now also changes "steps 2–6" to
+  "steps 2–5" in `.claude/agents/builder.md`. After the build skill loses its UI
+  step, step 6 is Report, which the builder agent must not run.
+
 ## 1.3.0 — 2026-10-23
 
 Lessons from the SysOps-Fleet setup (2026-10-22):
