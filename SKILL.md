@@ -17,7 +17,7 @@ Text between `<!-- graffino-agentic:begin vN -->` and `<!-- graffino-agentic:end
 owned by this skill; text outside the markers belongs to the repo and is never
 removed.
 
-Current version: **v1** (release 1.2.0; the markers carry the major version only).
+Current version: **v1** (release 1.3.0; the markers carry the major version only).
 
 ## 0. Preconditions
 
@@ -147,7 +147,8 @@ options, **your recommendation** and why, and the entries waiting on it:
 4. The user decides each item: keys `1`–`9` pick an option, `R` takes the
    recommendation, `E` an own answer, `X` rejects the finding, `U` undoes, arrows or
    `J`/`K` move, "Accept all recommendations" decides every open item at once.
-   Every click saves to the JSON file at once. "Done" stops the server
+   Every click saves to the JSON file at once, so never edit the JSON while the
+   server runs (it overwrites your edit); fix the `.md` record instead. "Done" stops the server
    (`REVIEW_DONE answered=n/m`); it also stops by itself after 120 idle minutes.
 5. Do not wait idle in the meantime: write everything that does not depend on a
    review item. When the server stops (you are notified), run 2.5.
@@ -190,10 +191,10 @@ AGENTS.md section 4 verbatim.
 | `docs/agents/README.md` | `templates/README.agents.md` | the one-page guide for people |
 | `docs/agents/REJECTED.md` | `templates/REJECTED.md` | rejected proposals and findings; never re-proposed |
 | `docs/agents/tools/ledger-lint.py` | `templates/tools/ledger-lint.py` | as is; run it with `--fix` after writing the ledger |
-| `.claude/skills/plan/SKILL.md` | `templates/skills/plan/SKILL.md` | as is |
-| `.claude/skills/build/SKILL.md` | `templates/skills/build/SKILL.md` | as is; remove the visual step if not visual |
-| `.claude/agents/planner.md` | `templates/agents/planner.md` | as is |
-| `.claude/agents/builder.md` | `templates/agents/builder.md` | as is |
+| `.claude/skills/plan/SKILL.md` | `templates/skills/plan/SKILL.md` | as is; not visual: remove the UI load step and the "Design (UI only)" section |
+| `.claude/skills/build/SKILL.md` | `templates/skills/build/SKILL.md` | as is; not visual: remove step 4 (UI changes), renumber, and drop "screenshots" from the description and report |
+| `.claude/agents/planner.md` | `templates/agents/planner.md` | as is; not visual: drop the `docs/design/` load |
+| `.claude/agents/builder.md` | `templates/agents/builder.md` | as is; not visual: drop "screenshots for UI" |
 
 **Visual apps also get:**
 
@@ -202,6 +203,15 @@ AGENTS.md section 4 verbatim.
 | `docs/design/DESIGN.md` | `templates/design/DESIGN.md` | fill the token tables from the real CSS / Tailwind config / Swift constants (step 4) |
 | `docs/design/registry.yaml` | `templates/design/registry.yaml` | one `DS-` entry per screen and per shared component |
 | `docs/design/screens/` | — | screenshots taken in step 4 (`<DS-id>.<light\|dark>.png`) |
+
+**`.gitignore` check.** A repo that ignores the whole `.claude/` folder would leave the
+skills and agents uncommitted. Replace that line with `.claude/*`, `!.claude/skills/`,
+`!.claude/agents/` (local settings stay ignored), and confirm with
+`git check-ignore -v .claude/skills/plan/SKILL.md` (no output = tracked).
+
+**IDs from other repos.** In any ledger or review text, write an ID that belongs to
+another repo with its repo prefix (`SysOps-AutoPkg:D-042`), never bare. The lint
+treats a bare ID as local and fails when this repo has no entry with that number.
 
 Existing file: merge. Replace only the marked block; keep everything outside it. A
 file without markers: add the marked block at the top and keep the old content
