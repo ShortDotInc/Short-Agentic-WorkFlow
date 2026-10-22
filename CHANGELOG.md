@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.3.0 — 2026-10-23
+
+Lessons from the SysOps-Fleet setup (2026-10-22):
+
+- **`.gitignore` check:** a repo that ignores all of `.claude/` now gets
+  `.claude/*` + `!.claude/skills/` + `!.claude/agents/`, so the project skills and
+  agents are committed while local settings stay ignored.
+- **Non-visual repos:** the UI parts are removed from all four copied files (plan
+  skill, build skill, planner and builder agents), not only from the build skill.
+- **IDs from other repos** are written with the repo prefix (`<repo>:D-0NN`), so the
+  lint does not read them as local references.
+- **Review UI:** never edit `backfill-review.json` while the server runs; it saves
+  every click and overwrites manual edits.
+- **Archaeologist brief:** never print process lists with arguments or environment
+  dumps (they can hold enroll secrets and tokens).
+
+## 1.2.1 — 2026-10-22
+
+- **Ledger lint fix:** an ID inside a consumed-contract link
+  (`` `<repo>:docs/agents/CONTRACTS.md#C-0NN` ``) no longer counts as a local
+  reference. Before, the lint reported "refers to C-0NN, which does not exist"
+  for every valid link whose ID had no local entry of the same number. Repos set
+  up with 1.2.0 get the fix on a re-run (the lint is copied as is).
+
 ## 1.2.0 — 2026-10-15
 
 - **ClickUp addon** (always asked): `.github/scripts/clickup-sync.py` (stdlib) +
