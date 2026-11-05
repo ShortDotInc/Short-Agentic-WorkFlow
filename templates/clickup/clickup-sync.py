@@ -2,10 +2,11 @@
 """ClickUp sync (Graffino Agentic Code Setup, ClickUp addon). Stdlib only.
 
 Modes
-  pr-link        PR opened: comment the branch and PR links on the ticket named in
-                 the branch (once per PR).
-  pr-ready       PR ready for review: comment, and move the ticket to the ready
-                 status (never backwards).
+  pr-link        PR opened or edited: comment the branch and PR links on the ticket
+                 named in the branch and on every ticket in the description's
+                 "Fixes <ticket>" / "Part of <ticket>" lines (once per ticket and PR).
+  pr-ready       PR ready for review: comment on every one of those tickets, and move
+                 each to the ready status (never backwards).
   release TAG    Tag pushed: comment "released in TAG" on every ticket in the release.
   publish-docs   Publish docs/agents (and docs/design/DESIGN.md) to a ClickUp Doc, one
                  page per file. Run locally; it updates docs/agents/clickup.json.
@@ -19,7 +20,7 @@ Environment
   PREFIX              ticket prefix, e.g. ABC
   AUTOMATION_LIVE     "true" = write; anything else = dry run (log only)
   CLICKUP_API_BASE    API base URL (default https://api.clickup.com; tests use a fake)
-  GITHUB_EVENT_PATH   set in CI; locally use --branch / --pr-url / --pr-title
+  GITHUB_EVENT_PATH   set in CI; locally use --branch / --pr-url / --pr-title / --pr-body-file
 
 Local examples
   CLICKUP_API_TOKEN="$(op read 'op://<vault>/<item>/credential')" AUTOMATION_LIVE=true \
@@ -95,41 +96,53 @@ def comment_once(ticket, text, marker, c):
 
 
 def pr_from_event(a):
+    """The PR's tickets: the one in the branch (or title), then every ticket named on a
+    "Fixes <ticket>" / "Part of <ticket>" line of the description (a delivery may cover
+    several tickets)."""
     ev = {}
     if os.environ.get("GITHUB_EVENT_PATH") and os.path.exists(os.environ["GITHUB_EVENT_PATH"]):
         ev = json.load(open(os.environ["GITHUB_EVENT_PATH"])).get("pull_request") or {}
     branch = a.branch or ev.get("head", {}).get("ref", "")
     url = a.pr_url or ev.get("html_url", "")
     title = a.pr_title or ev.get("title", "")
+    body = open(a.pr_body_file, encoding="utf-8").read() if a.pr_body_file else (ev.get("body") or "")
     repo = os.environ.get("GITHUB_REPOSITORY", os.path.basename(ROOT))
+    tickets = []
     m = TICKET.search(branch) or TICKET.search(title)
-    return (m.group(0) if m else None), branch, url, title, repo
+    if m:
+        tickets.append(m.group(0))
+    for line in body.splitlines():
+        if re.match(r"^\s*(Fixes|Part of)\b", line):
+            tickets += [t for t in TICKET.findall(line) if t not in tickets]
+    return tickets, branch, url, title, repo
 
 
 def pr_link(a, c):
-    ticket, branch, url, title, repo = pr_from_event(a)
-    if not ticket:
-        print("no ticket in the branch or PR title — nothing to do"); return 0
-    text = f"AI: Branch `{branch}` in {repo}\nAI: Draft PR {url}"
-    comment_once(ticket, text, url, c)
+    tickets, branch, url, title, repo = pr_from_event(a)
+    if not tickets:
+        print("no ticket in the branch, PR title or Fixes / Part of lines — nothing to do"); return 0
+    for ticket in tickets:
+        text = f"AI: Branch `{branch}` in {repo}\nAI: Draft PR {url}"
+        comment_once(ticket, text, url, c)
     return 0
 
 
 def pr_ready(a, c):
-    ticket, branch, url, title, repo = pr_from_event(a)
-    if not ticket:
-        print("no ticket in the branch or PR title — nothing to do"); return 0
-    comment_once(ticket, f"AI: PR ready for review: {url}", f"ready for review: {url}", c)
+    tickets, branch, url, title, repo = pr_from_event(a)
+    if not tickets:
+        print("no ticket in the branch, PR title or Fixes / Part of lines — nothing to do"); return 0
     ready = c.get("ready_status", "in review")
     order = [s.lower() for s in c.get("status_order", [])]
-    task = call("GET", task_path(ticket, c)) or {}
-    current = ((task.get("status") or {}).get("status") or "").lower()
-    if current and order and ready.lower() in order and current in order \
-            and order.index(current) >= order.index(ready.lower()):
-        print(f"{ticket}: status '{current}' is already at or past '{ready}' — not moved")
-        return 0
-    call("PUT", task_path(ticket, c), {"status": ready}, write=True)
-    log(f"{ticket}: status → {ready}")
+    for ticket in tickets:
+        comment_once(ticket, f"AI: PR ready for review: {url}", f"ready for review: {url}", c)
+        task = call("GET", task_path(ticket, c)) or {}
+        current = ((task.get("status") or {}).get("status") or "").lower()
+        if current and order and ready.lower() in order and current in order \
+                and order.index(current) >= order.index(ready.lower()):
+            print(f"{ticket}: status '{current}' is already at or past '{ready}' — not moved")
+            continue
+        call("PUT", task_path(ticket, c), {"status": ready}, write=True)
+        log(f"{ticket}: status → {ready}")
     return 0
 
 
@@ -151,7 +164,8 @@ def release(tag, c):
 def doc_files():
     ag = os.path.join(ROOT, "docs", "agents")
     order = ["README.md", "STATE.md", "ARCHITECTURE.md", "DECISIONS.md", "PATTERNS.md", "CONTRACTS.md",
-             "OPEN-QUESTIONS.md", "MANUAL-TESTS.md", "REJECTED.md", "BACKFILL-REVIEW.md"]
+             "OPEN-QUESTIONS.md", "MANUAL-TESTS.md", "DECISIONS-SUPERSEDED.md", "PATTERNS-SUPERSEDED.md",
+             "REJECTED.md", "BACKFILL-REVIEW.md"]
     out = []
     for name in order:
         p = os.path.join(ag, name)
@@ -269,6 +283,7 @@ def main():
     ap.add_argument("mode", choices=["pr-link", "pr-ready", "release", "publish-docs"])
     ap.add_argument("tag", nargs="?")
     ap.add_argument("--branch"); ap.add_argument("--pr-url"); ap.add_argument("--pr-title")
+    ap.add_argument("--pr-body-file", help="pr-link / pr-ready: the PR description, for its Fixes / Part of lines")
     ap.add_argument("--force", action="append", default=[], metavar="PATH",
                     help="publish-docs: overwrite this page even if it was edited in ClickUp")
     a = ap.parse_args()

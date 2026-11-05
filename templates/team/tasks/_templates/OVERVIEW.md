@@ -2,6 +2,8 @@
 ticket: {{PREFIX}}-XXX
 type: task | bug | investigation
 parent:
+covers: []                    # other tickets delivered on the same branch and PR
+delivered_in:                 # stub of a covered ticket: the delivery's ticket; rest of the file stays empty
 title: "<ticket title>"
 status: not-started | in-progress | blocked | in-review | done
 lane: full | fast
@@ -17,6 +19,16 @@ updated: YYYY-MM-DD HH:MM     # bump on every session
 
 ## Goal
 <1–3 sentences: why this ticket exists. Link the ticket.>
+
+## Context brief 🧾
+<Read first by every agent; kept short. The product owner starts it, the planner
+completes it.>
+- **Acceptance criteria (approved):** <checklist, per covered ticket>
+- **Tickets covered:** {{PREFIX}}-XXX (Fixes) · <{{PREFIX}}-… (Fixes / Part of)>
+- **Constraints that apply:** <D-/PATTERN-/C-/Q- ID — one line each>
+- **Where the code is:** <paths>
+- **Ownership:** integration owner: conductor · <one builder | worker → part>
+- **Verify with:** <commands>
 
 ## Resume here ⏯
 <The very next action, what is in flight, which branch and files, any half-done
