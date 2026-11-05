@@ -69,7 +69,9 @@ def pr_ready(c):
     if not ev:
         print("no pull_request event — nothing to post"); return 0
     url, title = ev.get("html_url", ""), ev.get("title", "")
-    tickets = sorted(set(TICKET.findall(f"{title} {ev.get('head', {}).get('ref', '')}"))) if TICKET else []
+    named = " ".join(l for l in (ev.get("body") or "").splitlines() if re.match(r"^\s*(Fixes|Part of)\b", l))
+    tickets = sorted(set(TICKET.findall(f"{title} {ev.get('head', {}).get('ref', '')} {named}")),
+                     key=lambda t: int(t.split("-")[-1])) if TICKET else []
     extra = f" · {', '.join(ticket_link(t, c) for t in tickets)}" if tickets else ""
     return post(f"{link(url, title or url)} Ready for review.{extra}")
 

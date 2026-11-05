@@ -10,6 +10,7 @@
 | Ticket prefix | {{PREFIX}} |
 | Tracker | {{TRACKER}} (e.g. ClickUp workspace / space / list) |
 | Backlog for new tickets | {{BACKLOG}} |
+| Ticket types | {{TICKET_TYPES}} (e.g. Task, Bug, Investigation, Design; a screen ticket's design subtask uses Design when the tracker has it) |
 | Ticket URL pattern | {{TICKET_URL}} (e.g. https://app.clickup.com/t/<workspace>/{{PREFIX}}-<id>) |
 | Base branch | {{BASE_BRANCH}} |
 | Merge method | {{MERGE_METHOD}} (who merges: {{MERGER}}) |
@@ -28,6 +29,6 @@ Title: <what, and where>
 Goal: <why>
 Acceptance criteria: <checkable bullets>
 Out of scope: <…>
-Design: <DS- IDs, or "no UI">
+Design: <the design subtask, or "no UI">
 Open questions: <Q- IDs, or "none">
 ```
