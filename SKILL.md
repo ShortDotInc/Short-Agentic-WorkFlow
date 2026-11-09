@@ -17,7 +17,8 @@ Text between `<!-- graffino-agentic:begin vN -->` and `<!-- graffino-agentic:end
 owned by this skill; text outside the markers belongs to the repo and is never
 removed.
 
-Current version: **v1** (release 1.4.0; the markers carry the major version only).
+Current version: **v1** (release 1.5.0; the markers carry the major version only, the
+stamp `docs/agents/.setup-version` carries the full release).
 
 ## 0. Preconditions
 
@@ -193,6 +194,7 @@ AGENTS.md section 4 verbatim.
 | `docs/agents/README.md` | `templates/README.agents.md` | the one-page guide for people |
 | `docs/agents/REJECTED.md` | `templates/REJECTED.md` | rejected proposals and findings; never re-proposed |
 | `docs/agents/tools/ledger-lint.py` | `templates/tools/ledger-lint.py` | as is; run it with `--fix` after writing the ledger |
+| `docs/agents/.setup-version` | `templates/setup-version` | the release from `VERSION`, the addons added (`team, clickup, slack` or `none`), today's date; rewritten at every re-run; the auto update check reads it |
 | `.claude/skills/plan/SKILL.md` | `templates/skills/plan/SKILL.md` | as is; not visual: remove the UI load step and the "Design (UI only)" section |
 | `.claude/skills/build/SKILL.md` | `templates/skills/build/SKILL.md` | as is; not visual: remove step 4 (UI changes), renumber, and drop "screenshots" from the description and report |
 | `.claude/agents/planner.md` | `templates/agents/planner.md` | as is; not visual: drop the `docs/design/` load |
@@ -413,12 +415,30 @@ On the user's go:
 
 ## Re-run (update)
 
-Read the version in the markers. Replace each marked block with the current
+Read the release in `docs/agents/.setup-version`; without it (set up before 1.5),
+read the version in the markers and the files present. Apply the steps of every
+release after it, in order. Replace each marked block with the current
 template, keep repo text, keep all ledger entries (never renumber, never delete;
 superseded entries stay). Add files that are new in this version (for example
 CONTRACTS.md and ARCHITECTURE.md in 1.1; `docs/agents/README.md` and
 `docs/agents/tools/ledger-lint.py` and `REJECTED.md` in 1.2, then run the lint with `--fix` and split
-ledgers above ~150 lines). Report what changed.
+ledgers above ~150 lines). Write `docs/agents/.setup-version` with the current
+release last. Report what changed.
+
+**Repo variants.** Before you copy a file "as is" (lint, scripts, skills, agents),
+compare it with the template of the stamped release. When the repo changed it in its
+own commits (`git log -- <file>`; for example a "Relay variant" of `team-checks.py`, or
+a check removed because the repo has no team addon), it is a variant: apply only the
+template's changes since that release to it, keep the repo's changes, and name the
+file in the report. Never overwrite a variant.
+
+On the go, commit `chore(agents): Graffino agentic code setup <release>` on
+`chore/agentic-code-setup` and merge it locally, as in step 6.
+
+From 1.4 to **1.5**:
+- Add `docs/agents/.setup-version` (step 3). No other file changes.
+- Tell the user once about the auto update check (section "Auto update") if
+  `~/.claude/settings.json` has no hook that runs `tools/check-update.py`.
 
 From 1.3 to **1.4**:
 - `AGENTS.md`: the new block brings the "Load on demand" table. Keep the repo's own
@@ -446,3 +466,16 @@ that disagrees with an existing entry is a clash.
 
 "Apply the review": run 2.5 only. "Review the backfill": reopen the UI (2.4 step 3)
 for the open items, then 2.5.
+
+## Auto update
+
+`tools/check-update.py` runs as a Claude Code SessionStart hook (install line in the
+script's header). At each session start it:
+1. Pulls this skill repo: fast-forward only, clean tree only, at most once per 6 hours.
+2. Compares the session repo's `docs/agents/.setup-version` with `VERSION`.
+3. When the repo is behind, adds context that tells you to run the re-run before the
+   task. Repos without the setup and up-to-date repos get no output.
+
+When that context arrives, do the re-run above. Skip it when the repo has uncommitted
+changes or is not on its default branch, and say that the repo is behind. The user's
+go is still needed for the commit; nothing is pushed.
