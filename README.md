@@ -58,7 +58,18 @@ ln -s ~/Work/Graffino/Internal/Graffino-Agentic-Coding-Setup-Skill \
   ~/.claude/skills/graffino-agentic-code-setup
 ```
 
-Update: `git -C ~/Work/Graffino/Internal/Graffino-Agentic-Coding-Setup-Skill pull`.
+Update: `git -C ~/Work/Graffino/Internal/Graffino-Agentic-Coding-Setup-Skill pull`,
+or install the auto update hook in `~/.claude/settings.json`:
+
+```json
+"SessionStart": [{"matcher": "startup|clear", "hooks": [{"type": "command",
+  "command": "python3 ~/.claude/skills/graffino-agentic-code-setup/tools/check-update.py",
+  "timeout": 20}]}]
+```
+
+At session start the hook pulls the skill (fast-forward only, at most every 6 hours).
+In a repo whose `docs/agents/.setup-version` is older than `VERSION`, Claude runs the
+re-run before the task. The commit still needs your go; nothing is pushed.
 
 ## Use
 
@@ -82,6 +93,8 @@ asks for the fast lane).
 Text between `<!-- graffino-agentic:begin vN -->` and `<!-- graffino-agentic:end -->`
 (and the `graffino-agentic:team` markers) belongs to the skill. A re-run replaces those
 blocks with the current templates, and keeps all repo text and all ledger entries.
+`docs/agents/.setup-version` records the full release applied to the repo; a re-run
+applies every release after it. Files the repo changed itself (variants) are merged, not overwritten.
 The marker carries the major version; releases follow semver (`VERSION`,
 `CHANGELOG.md`).
 
@@ -95,4 +108,5 @@ templates/backfill/       archaeologist brief + the temporary review UI (server 
 templates/team/           the optional team addon (rules, agents, /start, journal, PR template, CI)
 templates/clickup/        the optional ClickUp addon (clickup-sync.py, workflow, settings, rules)
 templates/slack/          the optional Slack addon (slack-notify.py, workflow, settings, rules)
+tools/check-update.py     the auto update check (SessionStart hook)
 ```

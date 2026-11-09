@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.5.0 — 2026-11-09
+
+- **Auto update:** `tools/check-update.py` runs as a SessionStart hook. It pulls the
+  skill repo (fast-forward, clean tree, at most every 6 hours) and, in a repo whose
+  setup is behind `VERSION`, tells Claude to run the re-run before the task. It never
+  writes into the repo; the commit still needs the user's go and nothing is pushed.
+- **Release stamp:** `docs/agents/.setup-version` records the full release, the
+  addons and the date; written at setup and at every re-run. The markers keep the
+  major version only.
+- **Re-run:** applies every release after the stamp in order, and keeps repo
+  variants of copied files (a file the repo changed in its own commits gets only
+  the template's new changes, never an overwrite).
+
 ## 1.4.0 — 2026-11-05
 
 Rules brought over from FiscalLink-Docs (2026-10-18 to 10-30):
