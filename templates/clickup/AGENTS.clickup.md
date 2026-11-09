@@ -2,11 +2,12 @@
 ## ClickUp addon
 
 Settings: `docs/agents/clickup.json` (workspace, Doc, ready status, status order).
-Token: the 1Password item {{OP_ITEM}} (API Credential); in CI the secret
-`CLICKUP_API_TOKEN`. Never print, log or commit it.
+Token: the 1Password item {{OP_ITEM}} (API Credential); in CI the
+repository secret `CLICKUP_API_TOKEN`, or `OP_SERVICE_ACCOUNT_TOKEN` loading it from 1Password. Never print, log or commit it.
 
-**Automatic (CI, `.github/workflows/clickup.yml`):** PR opened → branch and PR links on
-the ticket · PR ready for review → comment, ticket moves to the ready status (never
+**Automatic (CI, `.github/workflows/clickup.yml`):** PR opened or edited → branch and PR
+links on every ticket it covers (the branch's ticket and each `Fixes` / `Part of` line)
+· PR ready for review → comment, each of those tickets moves to the ready status (never
 backwards) · tag pushed → "released in" comment on every ticket in the release.
 Agents do not post these by hand; they check the CI run instead.
 

@@ -17,7 +17,8 @@ Text between `<!-- graffino-agentic:begin vN -->` and `<!-- graffino-agentic:end
 owned by this skill; text outside the markers belongs to the repo and is never
 removed.
 
-Current version: **v1** (release 1.3.1; the markers carry the major version only).
+Current version: **v1** (release 1.5.0; the markers carry the major version only, the
+stamp `docs/agents/.setup-version` carries the full release).
 
 ## 0. Preconditions
 
@@ -43,6 +44,7 @@ Find out, from the files (never guess):
 | Release flow | Makefile/CI, CHANGELOG, tags (`git tag --sort=-v:refname \| head`), branches (develop/master) |
 | Visual app? | views, templates, CSS/Tailwind, .svelte/.vue/.tsx/.blade.php/.html, SwiftUI/AppKit, Filament |
 | Existing rules | CLAUDE.md, AGENTS.md, .cursorrules, CONTRIBUTING, docs/*.md |
+| Docs needed only in some situations | protocol or vendor docs, device lists, glossaries, runbooks: each becomes a "Load on demand" row in AGENTS.md (when → file) |
 | Repo facts in memory | the auto-memory folder of this repo (`~/.claude/projects/<path-slug>/memory/`) |
 
 A fact you cannot find becomes an open question, not a value.
@@ -179,11 +181,12 @@ AGENTS.md section 4 verbatim.
 
 | File | Template | Notes |
 |---|---|---|
-| `AGENTS.md` | `templates/AGENTS.md` | fill sections 1–6 from Detect |
+| `AGENTS.md` | `templates/AGENTS.md` | fill sections 1–6 from Detect; replace the `{{…}}` line of "Load on demand" with one row per situational doc from Detect, or delete it |
 | `CLAUDE.md` | `templates/CLAUDE.md` | exactly `@AGENTS.md` (plus any `@` imports the repo already had) |
 | `CONTEXT.md` | `templates/CONTEXT.md` | project vocabulary: 5–20 domain terms with one-line definitions and `_Avoid_` synonyms |
-| `docs/agents/DECISIONS.md` | `templates/DECISIONS.md` | entries from step 2 |
-| `docs/agents/PATTERNS.md` | `templates/PATTERNS.md` | entries from step 2 |
+| `docs/agents/DECISIONS.md` | `templates/DECISIONS.md` | live entries from step 2 |
+| `docs/agents/PATTERNS.md` | `templates/PATTERNS.md` | live entries from step 2 |
+| `docs/agents/DECISIONS-SUPERSEDED.md`, `PATTERNS-SUPERSEDED.md` | `templates/DECISIONS-SUPERSEDED.md`, `templates/PATTERNS-SUPERSEDED.md` | superseded entries (the lint `--fix` moves them there); never in the always-loaded files |
 | `docs/agents/OPEN-QUESTIONS.md` | `templates/OPEN-QUESTIONS.md` | facts you could not find |
 | `docs/agents/CONTRACTS.md` | `templates/CONTRACTS.md` | provided, consumed and external interfaces (2.3) |
 | `docs/agents/ARCHITECTURE.md` | `templates/ARCHITECTURE.md` | from the `structure` lens |
@@ -191,10 +194,11 @@ AGENTS.md section 4 verbatim.
 | `docs/agents/README.md` | `templates/README.agents.md` | the one-page guide for people |
 | `docs/agents/REJECTED.md` | `templates/REJECTED.md` | rejected proposals and findings; never re-proposed |
 | `docs/agents/tools/ledger-lint.py` | `templates/tools/ledger-lint.py` | as is; run it with `--fix` after writing the ledger |
+| `docs/agents/.setup-version` | `templates/setup-version` | the release from `VERSION`, the addons added (`team, clickup, slack` or `none`), today's date; rewritten at every re-run; the auto update check reads it |
 | `.claude/skills/plan/SKILL.md` | `templates/skills/plan/SKILL.md` | as is; not visual: remove the UI load step and the "Design (UI only)" section |
 | `.claude/skills/build/SKILL.md` | `templates/skills/build/SKILL.md` | as is; not visual: remove step 4 (UI changes), renumber, and drop "screenshots" from the description and report |
 | `.claude/agents/planner.md` | `templates/agents/planner.md` | as is; not visual: drop the `docs/design/` load |
-| `.claude/agents/builder.md` | `templates/agents/builder.md` | as is; not visual: drop "screenshots for UI" and change "steps 2–6" to "steps 2–5" (the build skill lost its UI step) |
+| `.claude/agents/builder.md` | `templates/agents/builder.md` | as is; not visual: drop "screenshots for UI" and the `Screenshots:` handoff line, and change "steps 2–6" to "steps 2–5" (the build skill lost its UI step) |
 
 **Visual apps also get:**
 
@@ -203,11 +207,13 @@ AGENTS.md section 4 verbatim.
 | `docs/design/DESIGN.md` | `templates/design/DESIGN.md` | fill the token tables from the real CSS / Tailwind config / Swift constants (step 4) |
 | `docs/design/registry.yaml` | `templates/design/registry.yaml` | one `DS-` entry per screen and per shared component |
 | `docs/design/screens/` | — | screenshots taken in step 4 (`<DS-id>.<light\|dark>.png`) |
+| `docs/design/mocks/` | — | the designs of new or changed screens (`<DS-id>.html`); empty at setup |
 
 **`.gitignore` check.** A repo that ignores the whole `.claude/` folder would leave the
 skills and agents uncommitted. Replace that line with `.claude/*`, `!.claude/skills/`,
 `!.claude/agents/` (local settings stay ignored), and confirm with
-`git check-ignore -v .claude/skills/plan/SKILL.md` (no output = tracked).
+`git check-ignore -v .claude/skills/plan/SKILL.md` (no output = tracked). Then add
+`.claude/worktrees/` unless already ignored: agent worktrees must never be committed.
 
 **IDs from other repos.** In any ledger or review text, write an ID that belongs to
 another repo with its repo prefix (`SysOps-AutoPkg:D-042`), never bare. The lint
@@ -223,16 +229,25 @@ move its entries into topic files `docs/agents/<decisions|patterns|contracts|que
 the main file. `ledger-lint.py --fix` rebuilds the index grouped by topic. Agents load
 the indexes and open a topic file before they rely on an entry in it.
 
+**Superseded entries leave the always-loaded files.** `DECISIONS.md` and `PATTERNS.md`
+list only live entries; a superseded entry's index line (and the entry itself, when
+it was written in the main file) goes to `DECISIONS-SUPERSEDED.md` /
+`PATTERNS-SUPERSEDED.md`, under the same topic heading. A topic left with no live
+entry keeps its heading and points there. `ledger-lint.py --fix` does the moving.
+
 Write every file in plain, short English: active voice, one rule per bullet, at most
 ~20 words per sentence. AGENTS.md stays under ~150 lines; detail goes in the ledger.
 
 ## 3b. Team addon (optional — always ask)
 
 The base setup has no tickets, no PRs and no reviews. The **team addon** adds them:
-ticket-first work, ticket branches and commit titles, draft PRs with a five-section
+ticket-first work, deliveries (related tickets on one integration branch and draft
+PR, stacked PRs only when parts are separately reviewable), a five-section PR
 description, a product owner → plan → tests → build → reviewer pipeline with three
-user gates (`/start <ticket>`), a journal per ticket, and optional manual tests and
-CI checks. Everything is stored in this repo; there is no separate docs repo.
+user gates and a lane proposed by risk (`/start <ticket>`), parallel builders on
+private worker branches that the conductor integrates, a journal per ticket written
+by the conductor from the workers' handoffs, and optional manual tests and CI
+checks. Everything is stored in this repo; there is no separate docs repo.
 
 **Ask the user every time** (AskUserQuestion), before writing files: "Add the team
 addon (tickets, PRs, reviews) to this repo?" Default: no. A re-run on a repo that
@@ -241,10 +256,15 @@ The ClickUp and Slack addons (3c, 3d) are asked the same way, after this one.
 
 If yes, ask in one go for the settings in `templates/team/TEAM.md`: ticket prefix,
 manual-test paths, waiver person and baseline date (if manual tests = yes),
-tracker (e.g. a ClickUp list), backlog for new tickets, ticket URL pattern, base
-branch, who merges, ready-for-review notice, team rules doc (optional), manual tests
-(yes/no), CI checks (yes/no). **CI checks: ask which runner** (a Graffino
-self-hosted runner or a GitHub-hosted runner); never pick one.
+tracker (e.g. a ClickUp list), backlog for new tickets, ticket types (e.g. Task,
+Bug, Investigation, Design), ticket URL pattern, base branch, who merges,
+ready-for-review notice, team rules doc (optional), manual tests (yes/no), CI checks
+(yes/no). **CI checks: ask which runner** (see Runners below); never pick one.
+
+**Runners** (every addon workflow): offer the **Graffino self-hosted runner**
+(`[self-hosted, graffino]`) as the recommended option: GitHub-hosted runners used up
+the account's 3,000 Actions minutes in 2026-09. Offer a GitHub-hosted runner
+(`ubuntu-latest`) as the other option. Always ask; never pick one.
 
 Then write, filling `{{…}}` from the answers:
 
@@ -282,8 +302,8 @@ and/or docs publishing)?" Default: no. A repo that already has the
 If yes, ask in one go: which parts (ticket comments, docs publishing), the ClickUp
 workspace ID, the Doc for the docs (an existing Doc ID, or ask the user to create one
 and give its ID — never create it yourself), the ready status name and the status
-order, the 1Password item that holds the API token, and **which runner** for the CI
-workflow (Graffino self-hosted or GitHub-hosted; never pick one).
+order, the 1Password item that holds the API token, **how CI gets the token** (see
+Secrets below) and **which runner** for the CI workflow (3b → Runners; never pick one).
 
 | File | Template |
 |---|---|
@@ -292,10 +312,19 @@ workflow (Graffino self-hosted or GitHub-hosted; never pick one).
 | `.github/scripts/clickup-sync.py` | `templates/clickup/clickup-sync.py` (set the `PREFIX` default) |
 | `.github/workflows/clickup.yml` | `templates/clickup/clickup.yml` (only for ticket comments) |
 
-**Secrets:** the token lives in 1Password as an **API Credential** item. Tell the user
-to add the repository secret `CLICKUP_API_TOKEN` and, when ready, the repository
-variable `AUTOMATION_LIVE=true` (until then every run is a dry run that only logs).
-Never set secrets or variables yourself, and never print a token.
+**Secrets:** the token lives in 1Password as an **API Credential** item. CI gets it in
+one of two ways; ask which, and keep only that variant in the workflow (the template
+marks both):
+- **A. Repository secret:** `CLICKUP_API_TOKEN`.
+- **B. 1Password service account** (recommended when the repo has several automation
+  secrets): one repository secret `OP_SERVICE_ACCOUNT_TOKEN` (a service account that
+  can read the vault); the workflow loads the token with `1password/load-secrets-action`
+  from `{{OP_REF}}` (`op://<vault>/<item>/<field>`). Without the secret the workflow
+  skips with a notice; nothing fails.
+
+Tell the user which secret to add and, when ready, the repository variable
+`AUTOMATION_LIVE=true` (until then every run is a dry run that only logs). Never set
+secrets or variables yourself, and never print a token.
 
 Check before the commit: `python3 .github/scripts/clickup-sync.py publish-docs` without
 `AUTOMATION_LIVE` (a dry run) lists the pages it would create.
@@ -312,7 +341,9 @@ block is updated without asking.
 
 If yes, ask in one go: the channel (a label for the docs; the webhook decides the real
 channel), which notices, the ticket URL pattern (with `{ticket}`), the 1Password item
-that holds the webhook URL, and **which runner** for the CI workflow.
+that holds the webhook URL, how CI gets it (3c → Secrets: the repository secret
+`SLACK_WEBHOOK_URL`, or the 1Password service account) and **which runner** for the
+CI workflow (3b → Runners).
 
 | File | Template |
 |---|---|
@@ -321,8 +352,9 @@ that holds the webhook URL, and **which runner** for the CI workflow.
 | `.github/scripts/slack-notify.py` | `templates/slack/slack-notify.py` |
 | `.github/workflows/slack.yml` | `templates/slack/slack.yml` |
 
-**Secrets:** the webhook URL is a secret (1Password API Credential item). Tell the user
-to add the repository secret `SLACK_WEBHOOK_URL` and the variable
+**Secrets:** the webhook URL is a secret (1Password API Credential item). Keep one
+variant in the workflow, as in 3c. Tell the user which secret to add
+(`SLACK_WEBHOOK_URL` or `OP_SERVICE_ACCOUNT_TOKEN`) and the variable
 `AUTOMATION_LIVE=true` when ready. Never post to Slack during setup; check with a dry
 run: `python3 .github/scripts/slack-notify.py text "test"` prints the message only.
 
@@ -335,10 +367,11 @@ run: `python3 .github/scripts/slack-notify.py text "test"` prints the message on
    hard-coded value outside the token source as a finding (`path:line`), don't fix it.
 3. List screens and shared components with their source file; give each a DS- ID
    `DS-<repo-short>-<name>` in `registry.yaml`, `status: implemented`.
-4. **Design board** (optional; artboard file names on the board are unique and say what
-   they show, e.g. `CommandsList`, never `Main2`): if the user has a Claude Design board for this repo,
-   put its link in DESIGN.md → Source. "Pull the design" then copies it (DESIGN.md →
-   Pulling from the board).
+4. **Design board** (optional): designs change only in the repo (`docs/design/mocks/`);
+   a Claude Design board only shows them, published one way, and is where people
+   confirm a design. If the user has a board for this repo, put its link in
+   DESIGN.md → Source (a Figma snapshot file too, if any). "Publish the board" then
+   publishes to it (DESIGN.md → Publishing to the board); nothing is pulled back.
 5. Write the screenshot command for this stack into AGENTS.md section 2 (for
    example a headless browser for a web UI, `screencapture -l <window id>` for a Mac
    app, a Playwright script for a Laravel/Filament panel). If none can run here, add
@@ -349,8 +382,9 @@ run: `python3 .github/scripts/slack-notify.py text "test"` prints the message on
 - Every command written into AGENTS.md section 2 was run once, or is marked
   "not run: <reason>".
 - `python3 docs/agents/tools/ledger-lint.py --fix`, then without `--fix`: it passes
-  (unique IDs, required fields incl. evidence, indexes in sync, superseded-by targets
-  exist, consumed-contract links resolve where the provider repo is on disk).
+  (unique IDs, required fields incl. evidence, indexes in sync, superseded entries
+  only in the `*-SUPERSEDED.md` files, superseded-by targets exist, consumed-contract
+  links resolve where the provider repo is on disk, STATE.md rows ≤ 220 characters).
 - The `.claude/` files parse (frontmatter present, names unique).
 - `git status` shows only the files this skill created or changed.
 
@@ -368,7 +402,8 @@ Show the user, before any commit:
 5. Visual apps: token summary, number of DS- entries, hard-coded value findings.
 6. Commands that failed or were not run.
 7. Addons (team, ClickUp, Slack): added or not; the settings used; the secrets and
-   variables the user must add, and which runner each workflow uses.
+   variables the user must add (and which secrets variant), and which runner each
+   workflow uses.
 
 On the user's go:
 - Branch `chore/agentic-code-setup` from the default branch (develop if present).
@@ -380,12 +415,50 @@ On the user's go:
 
 ## Re-run (update)
 
-Read the version in the markers. Replace each marked block with the current
+Read the release in `docs/agents/.setup-version`; without it (set up before 1.5),
+read the version in the markers and the files present. Apply the steps of every
+release after it, in order. Replace each marked block with the current
 template, keep repo text, keep all ledger entries (never renumber, never delete;
 superseded entries stay). Add files that are new in this version (for example
 CONTRACTS.md and ARCHITECTURE.md in 1.1; `docs/agents/README.md` and
 `docs/agents/tools/ledger-lint.py` and `REJECTED.md` in 1.2, then run the lint with `--fix` and split
-ledgers above ~150 lines). Report what changed.
+ledgers above ~150 lines). Write `docs/agents/.setup-version` with the current
+release last. Report what changed.
+
+**Repo variants.** Before you copy a file "as is" (lint, scripts, skills, agents),
+compare it with the template of the stamped release. When the repo changed it in its
+own commits (`git log -- <file>`; for example a "Relay variant" of `team-checks.py`, or
+a check removed because the repo has no team addon), it is a variant: apply only the
+template's changes since that release to it, keep the repo's changes, and name the
+file in the report. Never overwrite a variant.
+
+On the go, commit `chore(agents): Graffino agentic code setup <release>` on
+`chore/agentic-code-setup` and merge it locally, as in step 6.
+
+From 1.4 to **1.5**:
+- Add `docs/agents/.setup-version` (step 3). No other file changes.
+- Tell the user once about the auto update check (section "Auto update") if
+  `~/.claude/settings.json` has no hook that runs `tools/check-update.py`.
+
+From 1.3 to **1.4**:
+- `AGENTS.md`: the new block brings the "Load on demand" table. Keep the repo's own
+  rows (anything not in the template) and add rows for situational docs (Detect).
+- Copy the new `ledger-lint.py`, add `DECISIONS-SUPERSEDED.md` and
+  `PATTERNS-SUPERSEDED.md`, and run `--fix`: superseded entries leave the
+  always-loaded files. Then run it without `--fix`; shorten STATE.md rows above 220
+  characters (the detail goes to the ticket's OVERVIEW).
+- `OPEN-QUESTIONS.md` gets the `Proposed answer` field in its header (entries keep theirs).
+- Visual apps with a `docs/design/board/` copy (1.2 "pull the design"): the board is no
+  longer pulled. Ask the user, then move the artboards they want to keep to
+  `docs/design/mocks/<DS-id>.html`, update `design_ref` in `registry.yaml`, delete
+  `docs/design/board/`, and replace "Pulling from the board" with the new DESIGN.md block.
+- Team addon: replace every team block and template (start, agents, journal
+  templates, PR template, `team-checks.py`); existing ticket folders stay as they
+  are. Add the "Ticket types" row to TEAM.md (ask for the value).
+- ClickUp and Slack addons: copy the new scripts; in each workflow keep the secrets
+  variant the repo uses (ask if unclear) and its runner. The ClickUp workflow now also
+  runs on `edited` PRs.
+- `.gitignore`: add `.claude/worktrees/` (step 3).
 
 A repo set up **before the backfill existed** (no `CONTRACTS.md`): run step 2 now.
 Existing entries keep their IDs; new findings continue the sequences; a new finding
@@ -393,3 +466,16 @@ that disagrees with an existing entry is a clash.
 
 "Apply the review": run 2.5 only. "Review the backfill": reopen the UI (2.4 step 3)
 for the open items, then 2.5.
+
+## Auto update
+
+`tools/check-update.py` runs as a Claude Code SessionStart hook (install line in the
+script's header). At each session start it:
+1. Pulls this skill repo: fast-forward only, clean tree only, at most once per 6 hours.
+2. Compares the session repo's `docs/agents/.setup-version` with `VERSION`.
+3. When the repo is behind, adds context that tells you to run the re-run before the
+   task. Repos without the setup and up-to-date repos get no output.
+
+When that context arrives, do the re-run above. Skip it when the repo has uncommitted
+changes or is not on its default branch, and say that the repo is behind. The user's
+go is still needed for the commit; nothing is pushed.

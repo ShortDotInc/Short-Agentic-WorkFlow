@@ -2,7 +2,8 @@
 """Team workflow checks for a pull request (Graffino agentic team addon).
 
 Checks the branch name, every commit title in the PR, the five PR description
-sections, the "Fixes / Part of <ticket>" line, and - when the PR changes a path in
+sections, the "Fixes / Part of <ticket>" lines (every ticket a commit names is one of
+them, or the branch's ticket), and - when the PR changes a path in
 .github/manual-test-paths - that the description names an MT- entry or says
 "Manual test: not needed". Self-contained: reads only the GitHub event file and the
 local git history. Exit 1 on any failure.
@@ -85,10 +86,10 @@ def main():
     errors = []
     if branch and not BRANCH_RE.match(branch):
         errors.append(f"branch '{branch}' must be feat|fix|chore/<short-name>-{PREFIX}-<id>")
-    if base:
-        for title in commit_titles(base, a.head):
-            if not COMMIT_RE.match(title):
-                errors.append(f"commit '{title}' must be '{PREFIX}-<id> - <type>(<scope>): <what>'")
+    titles = commit_titles(base, a.head) if base else []
+    for title in titles:
+        if not COMMIT_RE.match(title):
+            errors.append(f"commit '{title}' must be '{PREFIX}-<id> - <type>(<scope>): <what>'")
     globs = manual_test_globs()
     if base and globs and body is not None:
         hits = [f for f in changed_files(base, a.head) if any(fnmatch.fnmatch(f, g) for g in globs)]
@@ -101,6 +102,11 @@ def main():
                 errors.append(f"PR description misses the section '## {s}'")
         if not LINK_RE.search(body):
             errors.append(f"PR Summary needs 'Fixes {PREFIX}-<id>' or 'Part of {PREFIX}-<id>'")
+        covered = {m.group(0) for line in body.splitlines() if re.match(r"^(Fixes|Part of) ", line)
+                   for m in re.finditer(TICKET, line)}
+        covered |= set(re.findall(TICKET, branch or ""))
+        for t in sorted({re.match(TICKET, x).group(0) for x in titles if re.match(TICKET, x)} - covered):
+            errors.append(f"commits name {t}, but the PR Summary has no 'Fixes {t}' / 'Part of {t}' line")
 
     for e in errors:
         print(f"::error::{e}" if event_path else f"✗ {e}")

@@ -1,5 +1,62 @@
 # Changelog
 
+## 1.5.0 — 2026-11-09
+
+- **Auto update:** `tools/check-update.py` runs as a SessionStart hook. It pulls the
+  skill repo (fast-forward, clean tree, at most every 6 hours) and, in a repo whose
+  setup is behind `VERSION`, tells Claude to run the re-run before the task. It never
+  writes into the repo; the commit still needs the user's go and nothing is pushed.
+- **Release stamp:** `docs/agents/.setup-version` records the full release, the
+  addons and the date; written at setup and at every re-run. The markers keep the
+  major version only.
+- **Re-run:** applies every release after the stamp in order, and keeps repo
+  variants of copied files (a file the repo changed in its own commits gets only
+  the template's new changes, never an overwrite).
+
+## 1.4.0 — 2026-11-05
+
+Rules brought over from FiscalLink-Docs (2026-10-18 to 10-30):
+
+- **Deliveries (team addon):** related tickets that ship together share one
+  integration branch and draft PR, with one `Fixes` / `Part of` line per ticket and
+  the links on every ticket. Stacked PRs on a parent ticket's branch only when a part
+  is separately reviewable or releasable. Commit titles name the ticket they
+  implement; nothing pushed is amended, rebased or force-pushed.
+- **Lane by risk:** `/start` proposes the full or fast lane from a list of markers
+  (unclear behaviour, contract change, migration, security, UI without a confirmed
+  design, several dependent tickets); the user confirms. Replaces "fast = size S".
+- **Parallel builders** work on private worker branches (never pushed); the conductor
+  integrates them (rebase or cherry-pick, fast-forward) and reruns the affected checks.
+- **Handoffs:** builders and the test author return a fixed handoff; only the
+  conductor writes the session log, OVERVIEW and STATE. A **context brief** in
+  OVERVIEW is read first by every agent. Stub OVERVIEWs for covered tickets.
+- **Defects met during the work:** fixed in the same PR only when they block an
+  approved criterion, are clear and small, reproduction first; anything else goes to
+  Observations. Also in the base `/build` (it used to fix every related defect).
+- **Simplicity rule:** the smallest change that meets the criteria; a new abstraction,
+  dependency or option needs a reason today. In AGENTS.md, `/plan`, `/build` and the
+  reviewer.
+- **Reviewer:** reviews the integrated branch, reruns the tests there, reads the
+  decision indexes in full, checks linear history and covered tickets.
+- **Product owner:** subtasks only for separate deliverables, Investigations only for
+  questions the code can't answer; tracker dependencies (blocked by) between created
+  tickets; Design ticket type (TEAM.md "Ticket types").
+- **Design:** designs change only in the repo (`docs/design/mocks/`); the Claude
+  Design board is published one way and is where a design is confirmed; Figma is a
+  snapshot regenerated on request. "Pull the design" is gone. A ticket with UI needs a
+  confirmed design subtask; tickets don't cite DS- IDs.
+- **Ledger:** superseded entries move to `DECISIONS-SUPERSEDED.md` /
+  `PATTERNS-SUPERSEDED.md`, out of the always-loaded files (`ledger-lint.py --fix`
+  moves them and checks it). STATE.md rows ≤ 220 characters. Questions get a
+  `Proposed answer` field (the question stays investigating until the user confirms).
+- **AGENTS.md:** a "Load on demand" table (when → file), filled from Detect.
+- **CI:** the ClickUp and Slack scripts cover every ticket in the PR's `Fixes` /
+  `Part of` lines (the ClickUp workflow also runs on edited PRs); `team-checks.py`
+  fails when a commit names a ticket the PR Summary doesn't. Workflows offer a
+  1Password service account (`OP_SERVICE_ACCOUNT_TOKEN`) or a repository secret. The
+  Graffino self-hosted runner is recommended (still asked).
+- **`.gitignore`:** `.claude/worktrees/` is ignored.
+
 ## 1.3.1 — 2026-10-23
 
 - **Non-visual builder agent:** the note now also changes "steps 2–6" to

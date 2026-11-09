@@ -12,19 +12,20 @@ The base has no tickets, no PRs and no reviews by default. An optional **team ad
 |---|---|
 | Rules the agent always loads | `AGENTS.md` (+ `CLAUDE.md` = `@AGENTS.md`), `CONTEXT.md` (project vocabulary) |
 | Knowledge ledger with a gate | `docs/agents/DECISIONS.md`, `PATTERNS.md`, `CONTRACTS.md` (C- IDs), `OPEN-QUESTIONS.md`, `ARCHITECTURE.md` |
-| Ledger tooling | `docs/agents/tools/ledger-lint.py` (checks IDs, fields, links; rebuilds indexes; `--next D`); index + topic files above ~150 lines; `Confirmed:` dates collapse in plans |
+| Ledger tooling | `docs/agents/tools/ledger-lint.py` (checks IDs, fields, links; rebuilds indexes; moves superseded entries to `*-SUPERSEDED.md`, out of the always-loaded files; `--next D`); index + topic files above ~150 lines; `Confirmed:` dates collapse in plans |
 | Guide for people | `docs/agents/README.md` |
 | Backfill (existing repos) | read-only agents mine code, git history, PRs, docs and memory; clashes only go to a temporary review UI; record in `BACKFILL-REVIEW.md` |
 | Plan, then build (tests first) | `.claude/skills/plan`, `.claude/skills/build`, `.claude/agents/planner.md`, `builder.md` |
-| Visual apps: design guardrails | `docs/design/DESIGN.md` (rules, procedure, real tokens), `registry.yaml` (DS- IDs), `screens/` |
-| Optional ClickUp addon | CI comments branch/PR links on the ticket, moves it to "in review" when the PR is ready (never backwards), comments "released in" on every ticket of a tag; publishes `docs/agents` to a ClickUp Doc (pages edited in ClickUp are skipped and reported) |
+| Visual apps: design guardrails | `docs/design/DESIGN.md` (rules, procedure, real tokens), `registry.yaml` (DS- IDs), `screens/`, `mocks/`; designs change only in the repo and are published one way to a Claude Design board to be confirmed |
+| Optional ClickUp addon | CI comments branch/PR links on every ticket the PR covers, moves each to "in review" when the PR is ready (never backwards), comments "released in" on every ticket of a tag; publishes `docs/agents` to a ClickUp Doc (pages edited in ClickUp are skipped and reported) |
 | Optional Slack addon | CI posts "<PR> Ready for review." and a release notice (tickets, open manual tests) through a webhook |
-| Optional team addon | `STATE.md` (tickets in flight), ticket-first work, ticket branches and commit titles, draft PRs (5-section template), `/start <ticket>` pipeline (product owner → plan → test author → build → reviewer, 3 user gates), a journal per ticket, manual tests, a self-contained CI check |
+| Optional team addon | `STATE.md` (tickets in flight), ticket-first work, deliveries (related tickets on one branch and draft PR; stacked PRs only when needed), 5-section PR template, `/start <ticket>` pipeline (lane proposed by risk; product owner → plan → test author → build → reviewer, 3 user gates), parallel builders on private branches the conductor integrates, handoffs and a journal per ticket, manual tests, a self-contained CI check |
 
 The skill asks every time whether to add each addon (team, ClickUp, Slack). For every
-CI workflow it asks which runner to use. Addon automation is a dry run (log only)
-until you set the repository variable `AUTOMATION_LIVE=true`; tokens live in
-1Password and in repository secrets, never in files.
+CI workflow it asks which runner to use (the Graffino self-hosted runner is
+recommended). Addon automation is a dry run (log only) until you set the repository
+variable `AUTOMATION_LIVE=true`; tokens live in 1Password and reach CI through a
+repository secret or a 1Password service account, never through files.
 
 ### The gate
 *Does this change something already approved?* Additive work (a candidate pattern,
@@ -57,7 +58,18 @@ ln -s ~/Work/Graffino/Internal/Graffino-Agentic-Coding-Setup-Skill \
   ~/.claude/skills/graffino-agentic-code-setup
 ```
 
-Update: `git -C ~/Work/Graffino/Internal/Graffino-Agentic-Coding-Setup-Skill pull`.
+Update: `git -C ~/Work/Graffino/Internal/Graffino-Agentic-Coding-Setup-Skill pull`,
+or install the auto update hook in `~/.claude/settings.json`:
+
+```json
+"SessionStart": [{"matcher": "startup|clear", "hooks": [{"type": "command",
+  "command": "python3 ~/.claude/skills/graffino-agentic-code-setup/tools/check-update.py",
+  "timeout": 20}]}]
+```
+
+At session start the hook pulls the skill (fast-forward only, at most every 6 hours).
+In a repo whose `docs/agents/.setup-version` is older than `VERSION`, Claude runs the
+re-run before the task. The commit still needs your go; nothing is pushed.
 
 ## Use
 
@@ -73,13 +85,16 @@ commits only on your go: branch `chore/agentic-code-setup`, merged into the defa
 branch locally. It never pushes.
 
 Then, day to day in that repo: `/plan` → approve → `/build`. With the team addon:
-`/start ABC-123` (or `/start ABC-123 fast` for a size-S ticket).
+`/start ABC-123` (it proposes the full or fast lane by risk; `/start ABC-123 fast`
+asks for the fast lane).
 
 ## Re-run and versions
 
 Text between `<!-- graffino-agentic:begin vN -->` and `<!-- graffino-agentic:end -->`
 (and the `graffino-agentic:team` markers) belongs to the skill. A re-run replaces those
 blocks with the current templates, and keeps all repo text and all ledger entries.
+`docs/agents/.setup-version` records the full release applied to the repo; a re-run
+applies every release after it. Files the repo changed itself (variants) are merged, not overwritten.
 The marker carries the major version; releases follow semver (`VERSION`,
 `CHANGELOG.md`).
 
@@ -93,4 +108,5 @@ templates/backfill/       archaeologist brief + the temporary review UI (server 
 templates/team/           the optional team addon (rules, agents, /start, journal, PR template, CI)
 templates/clickup/        the optional ClickUp addon (clickup-sync.py, workflow, settings, rules)
 templates/slack/          the optional Slack addon (slack-notify.py, workflow, settings, rules)
+tools/check-update.py     the auto update check (SessionStart hook)
 ```
