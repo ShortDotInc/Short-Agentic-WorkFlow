@@ -1,4 +1,4 @@
-<!-- graffino-agentic:team:begin v1 -->
+<!-- short-agentic:team:begin v1 -->
 ## Team workflow (tickets, PRs, reviews)
 
 This repo runs the team addon. These rules add to "How we work here" and win where
@@ -85,4 +85,4 @@ the journal.
 row ≤ 220 characters); every session that starts, pauses or finishes a ticket updates
 its row.
 {{MANUAL_TESTS_RULE}}
-<!-- graffino-agentic:team:end -->
+<!-- short-agentic:team:end -->

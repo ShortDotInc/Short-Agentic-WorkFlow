@@ -1,4 +1,4 @@
-<!-- graffino-agentic:slack:begin v1 -->
+<!-- short-agentic:slack:begin v1 -->
 ## Slack addon
 
 Settings: `docs/agents/slack.json` (channel label, ticket link, which notices).
@@ -11,4 +11,4 @@ tests still open. Dry run until the repository variable `AUTOMATION_LIVE` is "tr
 
 Agents post nothing else to Slack without the user's OK on the exact text. A local
 one-off: `SLACK_WEBHOOK_URL="$(op read '{{OP_REF}}')" AUTOMATION_LIVE=true python3 .github/scripts/slack-notify.py text "…"`
-<!-- graffino-agentic:slack:end -->
+<!-- short-agentic:slack:end -->

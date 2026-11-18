@@ -1,4 +1,4 @@
-# .github/workflows/clickup.yml · Graffino agentic ClickUp addon
+# .github/workflows/clickup.yml · Short agentic ClickUp addon
 # PR opened or edited → branch + PR links on every ticket it covers (Fixes / Part of lines) · PR ready → comment + ticket to the ready status
 # Tag vX.Y.Z → "released in" comment on every ticket in the release.
 # Dry run (log only) until the repository variable AUTOMATION_LIVE is "true".

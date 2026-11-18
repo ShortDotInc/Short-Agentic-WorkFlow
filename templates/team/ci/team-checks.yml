@@ -1,4 +1,4 @@
-# .github/workflows/team-checks.yml · Graffino agentic team addon
+# .github/workflows/team-checks.yml · Short agentic team addon
 # PRs to {{BASE_BRANCH}}: ledger lint, branch name, commit titles, PR description, manual-test paths.
 # Tags vX.Y.Z: ledger lint + a release report (tickets, manual tests still open).
 # Self-contained: the logic is .github/scripts/team-checks.py in this repo.

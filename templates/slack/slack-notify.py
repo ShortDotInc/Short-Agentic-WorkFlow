@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Slack notices (Graffino Agentic Code Setup, Slack addon). Stdlib only.
+"""Slack notices (Short Agentic Code Setup, Slack addon). Stdlib only.
 
 Modes
   pr-ready       PR ready for review → "<PR link> Ready for review." (+ ticket link)

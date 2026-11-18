@@ -1,4 +1,4 @@
-# Graffino Agentic Code Setup (Claude Code skill)
+# Short Agentic Code Setup (Claude Code skill)
 
 A Claude Code skill that installs a small, self-contained agentic working system into
 any code repository, new or existing. Every file it writes lives in that repository;
@@ -22,8 +22,8 @@ The base has no tickets, no PRs and no reviews by default. An optional **team ad
 | Optional team addon | `STATE.md` (tickets in flight), ticket-first work, deliveries (related tickets on one branch and draft PR; stacked PRs only when needed), 5-section PR template, `/start <ticket>` pipeline (lane proposed by risk; product owner → plan → test author → build → reviewer, 3 user gates), parallel builders on private branches the conductor integrates, handoffs and a journal per ticket, manual tests, a self-contained CI check |
 
 The skill asks every time whether to add each addon (team, ClickUp, Slack). For every
-CI workflow it asks which runner to use (the Graffino self-hosted runner is
-recommended). Addon automation is a dry run (log only) until you set the repository
+CI workflow it asks which runner to use (a self-hosted runner is
+recommended when you have one). Addon automation is a dry run (log only) until you set the repository
 variable `AUTOMATION_LIVE=true`; tokens live in 1Password and reach CI through a
 repository secret or a 1Password service account, never through files.
 
@@ -52,18 +52,18 @@ Stale facts are dropped with a reason. No rule is dropped.
 ## Install
 
 ```bash
-git clone git@github.com:Graffino/Graffino-Agentic-Coding-Setup-Skill.git \
-  ~/Work/Graffino/Internal/Graffino-Agentic-Coding-Setup-Skill
-ln -s ~/Work/Graffino/Internal/Graffino-Agentic-Coding-Setup-Skill \
-  ~/.claude/skills/graffino-agentic-code-setup
+git clone https://github.com/ShortDotInc/Short-Agentic-WorkFlow.git \
+  ~/Work/Short-Agentic-WorkFlow
+ln -s ~/Work/Short-Agentic-WorkFlow \
+  ~/.claude/skills/short-agentic-code-setup
 ```
 
-Update: `git -C ~/Work/Graffino/Internal/Graffino-Agentic-Coding-Setup-Skill pull`,
+Update: `git -C ~/Work/Short-Agentic-WorkFlow pull`,
 or install the auto update hook in `~/.claude/settings.json`:
 
 ```json
 "SessionStart": [{"matcher": "startup|clear", "hooks": [{"type": "command",
-  "command": "python3 ~/.claude/skills/graffino-agentic-code-setup/tools/check-update.py",
+  "command": "python3 ~/.claude/skills/short-agentic-code-setup/tools/check-update.py",
   "timeout": 20}]}]
 ```
 
@@ -71,12 +71,19 @@ At session start the hook pulls the skill (fast-forward only, at most every 6 ho
 In a repo whose `docs/agents/.setup-version` is older than `VERSION`, Claude runs the
 re-run before the task. The commit still needs your go; nothing is pushed.
 
+Upgrading from the old name (Graffino Agentic Code Setup): the clone keeps
+working (GitHub redirects the old URL), but point it at the new one with
+`git remote set-url origin https://github.com/ShortDotInc/Short-Agentic-WorkFlow.git`,
+rename the symlink to `~/.claude/skills/short-agentic-code-setup`, and update the hook
+path. Repos set up before 1.6 keep their `graffino-agentic` markers until the next
+re-run renames them.
+
 ## Use
 
 In a repo, in Claude Code:
 
 ```text
-/graffino-agentic-code-setup
+/short-agentic-code-setup
 ```
 
 The skill detects the stack, commands and layout, writes the files, shows a report
@@ -90,8 +97,8 @@ asks for the fast lane).
 
 ## Re-run and versions
 
-Text between `<!-- graffino-agentic:begin vN -->` and `<!-- graffino-agentic:end -->`
-(and the `graffino-agentic:team` markers) belongs to the skill. A re-run replaces those
+Text between `<!-- short-agentic:begin vN -->` and `<!-- short-agentic:end -->`
+(and the `short-agentic:team` markers) belongs to the skill. A re-run replaces those
 blocks with the current templates, and keeps all repo text and all ledger entries.
 `docs/agents/.setup-version` records the full release applied to the repo; a re-run
 applies every release after it. Files the repo changed itself (variants) are merged, not overwritten.

@@ -2,7 +2,7 @@
 name: build
 description: Build an approved plan (or a small, clear fix) in this repo - tests first where tests exist, then code until they pass, then the definition-of-done checks and, for UI, screenshots compared with the design. Records new practices as candidate patterns. Use after /plan is approved, or when the user says "/build" or "build it".
 ---
-<!-- graffino-agentic:begin v1 -->
+<!-- short-agentic:begin v1 -->
 
 # /build
 
@@ -86,4 +86,4 @@ reproduction), deviations from the plan and why, new abstractions or dependencie
 and their reason, candidate patterns and Q- entries added, observations, what
 remains. Then ask whether to merge
 the branch into the default branch.
-<!-- graffino-agentic:end -->
+<!-- short-agentic:end -->

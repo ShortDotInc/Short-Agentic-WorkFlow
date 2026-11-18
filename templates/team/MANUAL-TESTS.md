@@ -1,6 +1,6 @@
 # Manual tests — {{repo}}
 
-<!-- graffino-agentic:team:begin v1 -->
+<!-- short-agentic:team:begin v1 -->
 > What only a person on real hardware or in a real environment can prove. Manual
 > tests can be postponed, never skipped silently: a postponed test stays visible here.
 >
@@ -18,7 +18,7 @@
 >
 > Baseline: everything released before {{BASELINE_DATE}} counts as tested.
 > Statuses: 🔴 untested · ❌ failed · ✅ passed · ⚪ waived.
-<!-- graffino-agentic:team:end -->
+<!-- short-agentic:team:end -->
 
 ## Environments
 | Name | What (device / OS / account / env) | Who holds it |

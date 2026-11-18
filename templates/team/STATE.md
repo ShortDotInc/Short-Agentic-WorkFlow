@@ -1,10 +1,10 @@
 # STATE — {{repo}}
 
-<!-- graffino-agentic:team:begin v1 -->
+<!-- short-agentic:team:begin v1 -->
 > What exists and what is in flight. **An index, not a narrative:** at most 150 lines,
 > each table row at most 220 characters (`ledger-lint.py` checks both). Detail lives in the ticket folders and the ledger.
 > Updated by every session that starts, pauses or finishes a ticket.
-<!-- graffino-agentic:team:end -->
+<!-- short-agentic:team:end -->
 
 Updated {{YYYY-MM-DD}}.
 

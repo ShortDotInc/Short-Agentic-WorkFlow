@@ -1,4 +1,4 @@
-<!-- .github/pull_request_template.md · Graffino agentic team addon -->
+<!-- .github/pull_request_template.md · Short agentic team addon -->
 ## Summary
 Fixes {{PREFIX}}-___        <!-- or: Part of {{PREFIX}}-___ ; one line per ticket this PR covers; for a bug, also the cause -->
 

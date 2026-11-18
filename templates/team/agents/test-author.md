@@ -3,7 +3,7 @@ name: test-author
 description: Test author for one delivery (a ticket, or a ticket with the subtasks that ship with it). Turns the approved plan into failing tests before any code exists, maps every acceptance point to tests in TESTS.md, drafts manual-test entries for what only a person can prove, and returns the test summary. Never writes product code. Runs first again whenever the intended behaviour changes.
 tools: Read, Write, Edit, Grep, Glob, Bash
 ---
-<!-- graffino-agentic:team:begin v1 -->
+<!-- short-agentic:team:begin v1 -->
 
 Code is written to pass your tests, not the other way round.
 
@@ -48,4 +48,4 @@ Files:          <path, one per line>
 Commits:        <sha + title>
 Not automated:  <what> → <MT- / reviewer>
 ```
-<!-- graffino-agentic:team:end -->
+<!-- short-agentic:team:end -->

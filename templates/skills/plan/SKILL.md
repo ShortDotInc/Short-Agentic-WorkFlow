@@ -2,7 +2,7 @@
 name: plan
 description: Plan a change in this repo before any edit - approach, files, tests, risks, and the full list of decisions, patterns and open questions the plan relies on, for the user to confirm. Use for any change beyond a few lines, any design choice, anything that touches an approved decision, or when the user says "/plan" or "plan this".
 ---
-<!-- graffino-agentic:begin v1 -->
+<!-- short-agentic:begin v1 -->
 
 # /plan
 
@@ -100,4 +100,4 @@ plan to `docs/agents/tasks/<ticket>/PLAN.md`. Record each knowledge call there.
 Show the plan. Ask the user to approve, adjust or drop it, and to call each
 knowledge entry. A *wrong* or *outdated* call becomes a PROPOSAL (AGENTS.md → The
 gate). An *answered* call updates the Q- entry. Then stop.
-<!-- graffino-agentic:end -->
+<!-- short-agentic:end -->

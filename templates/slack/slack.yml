@@ -1,4 +1,4 @@
-# .github/workflows/slack.yml · Graffino agentic Slack addon
+# .github/workflows/slack.yml · Short agentic Slack addon
 # PR ready for review → "<PR> Ready for review." · Tag vX.Y.Z → release notice (tickets, open manual tests).
 # Dry run (prints the message) until the repository variable AUTOMATION_LIVE is "true".
 # Logic: .github/scripts/slack-notify.py (in this repo). Skips quietly without the secret.

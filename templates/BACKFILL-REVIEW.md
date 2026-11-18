@@ -1,13 +1,13 @@
 # Backfill review — {{repo}}
 
-<!-- graffino-agentic:begin v1 -->
+<!-- short-agentic:begin v1 -->
 > Only the items where the sources disagree. Everything the code consistently
 > follows is already recorded as `approved` in the ledger and needs no review.
 > **How to answer:** in the review UI Claude opens (keys 1–9, R = recommendation,
 > E = own answer, X = reject), or write your choice after `Answer:` here and tell
 > Claude "apply the backfill review". Answered items become ledger entries; rejected
 > ones move to Rejected. "review the backfill" reopens the UI for open items.
-<!-- graffino-agentic:end -->
+<!-- short-agentic:end -->
 
 Backfill run: {{YYYY-MM-DD}} · clashes: {{n}} · entries recorded without review: {{n}}
 

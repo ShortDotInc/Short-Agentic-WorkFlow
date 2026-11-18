@@ -1,9 +1,9 @@
 ---
-name: graffino-agentic-code-setup
-description: Set up or update the agentic working rules in a code repository - AGENTS.md, CLAUDE.md, CONTEXT.md, a decisions/patterns/contracts/open-questions ledger and ARCHITECTURE.md, filled for existing repos by a backfill that assumes from the code and opens a temporary review UI for clashes only, /plan and /build skills, planner and builder agents, and for visual apps the design guardrails, design registry and screenshot procedure; optionally a team addon (tickets, PRs, reviews, journals), a ClickUp addon (automatic ticket comments, docs published to a ClickUp Doc) and a Slack addon (PR-ready and release notices), each asked about every time. Use for a new project, for an existing repo without these files, or to bring a repo up to the current version ("/graffino-agentic-code-setup", "set up agent rules", "add the agentic setup to this repo", "update the project setup", "backfill this repo", "review the backfill", "apply the backfill review").
+name: short-agentic-code-setup
+description: Set up or update the agentic working rules in a code repository - AGENTS.md, CLAUDE.md, CONTEXT.md, a decisions/patterns/contracts/open-questions ledger and ARCHITECTURE.md, filled for existing repos by a backfill that assumes from the code and opens a temporary review UI for clashes only, /plan and /build skills, planner and builder agents, and for visual apps the design guardrails, design registry and screenshot procedure; optionally a team addon (tickets, PRs, reviews, journals), a ClickUp addon (automatic ticket comments, docs published to a ClickUp Doc) and a Slack addon (PR-ready and release notices), each asked about every time. Use for a new project, for an existing repo without these files, or to bring a repo up to the current version ("/short-agentic-code-setup", "set up agent rules", "add the agentic setup to this repo", "update the project setup", "backfill this repo", "review the backfill", "apply the backfill review").
 ---
 
-# Graffino Agentic Code Setup
+# Short Agentic Code Setup
 
 You install a small, self-contained working system into ONE repository: rules the
 agent always loads, a knowledge ledger with a gate, a plan-then-build flow with tests
@@ -13,11 +13,13 @@ docs and journals, lives in the repo itself; nothing points to a shared folder o
 separate docs repo.
 
 Templates are in `templates/` next to this file. `{{…}}` marks a value you fill in.
-Text between `<!-- graffino-agentic:begin vN -->` and `<!-- graffino-agentic:end -->` is
+Text between `<!-- short-agentic:begin vN -->` and `<!-- short-agentic:end -->` is
 owned by this skill; text outside the markers belongs to the repo and is never
-removed.
+removed. Repos set up before 1.6 carry the same markers under the old skill name
+(`graffino-agentic:…`); treat them as this skill's markers and rename them on the
+re-run (see "From 1.5 to 1.6").
 
-Current version: **v1** (release 1.5.0; the markers carry the major version only, the
+Current version: **v1** (release 1.6.0; the markers carry the major version only, the
 stamp `docs/agents/.setup-version` carries the full release).
 
 ## 0. Preconditions
@@ -216,7 +218,7 @@ skills and agents uncommitted. Replace that line with `.claude/*`, `!.claude/ski
 `.claude/worktrees/` unless already ignored: agent worktrees must never be committed.
 
 **IDs from other repos.** In any ledger or review text, write an ID that belongs to
-another repo with its repo prefix (`SysOps-AutoPkg:D-042`), never bare. The lint
+another repo with its repo prefix (`Other-Repo:D-042`), never bare. The lint
 treats a bare ID as local and fails when this repo has no entry with that number.
 
 Existing file: merge. Replace only the marked block; keep everything outside it. A
@@ -251,7 +253,7 @@ checks. Everything is stored in this repo; there is no separate docs repo.
 
 **Ask the user every time** (AskUserQuestion), before writing files: "Add the team
 addon (tickets, PRs, reviews) to this repo?" Default: no. A re-run on a repo that
-already has the `graffino-agentic:team` block updates it without asking again.
+already has the `short-agentic:team` block updates it without asking again.
 The ClickUp and Slack addons (3c, 3d) are asked the same way, after this one.
 
 If yes, ask in one go for the settings in `templates/team/TEAM.md`: ticket prefix,
@@ -261,10 +263,10 @@ Bug, Investigation, Design), ticket URL pattern, base branch, who merges,
 ready-for-review notice, team rules doc (optional), manual tests (yes/no), CI checks
 (yes/no). **CI checks: ask which runner** (see Runners below); never pick one.
 
-**Runners** (every addon workflow): offer the **Graffino self-hosted runner**
-(`[self-hosted, graffino]`) as the recommended option: GitHub-hosted runners used up
-the account's 3,000 Actions minutes in 2026-09. Offer a GitHub-hosted runner
-(`ubuntu-latest`) as the other option. Always ask; never pick one.
+**Runners** (every addon workflow): when the team has a **self-hosted runner**, offer
+it (its labels, e.g. `[self-hosted, <label>]`) as the recommended option: GitHub-hosted
+runners can use up an account's included Actions minutes fast. Offer a GitHub-hosted
+runner (`ubuntu-latest`) as the other option. Always ask; never pick one.
 
 Then write, filling `{{…}}` from the answers:
 
@@ -297,7 +299,7 @@ docs publishing works without it.
 
 **Ask the user every time** (AskUserQuestion): "Add the ClickUp addon (ticket comments
 and/or docs publishing)?" Default: no. A repo that already has the
-`graffino-agentic:clickup` block is updated without asking.
+`short-agentic:clickup` block is updated without asking.
 
 If yes, ask in one go: which parts (ticket comments, docs publishing), the ClickUp
 workspace ID, the Doc for the docs (an existing Doc ID, or ask the user to create one
@@ -336,7 +338,7 @@ and a release notice on every tag: the release, its tickets (linked when a ticke
 is set) and the manual tests still open. Posts through an incoming webhook.
 
 **Ask the user every time** (AskUserQuestion): "Add the Slack addon (PR-ready and
-release notices)?" Default: no. A repo that already has the `graffino-agentic:slack`
+release notices)?" Default: no. A repo that already has the `short-agentic:slack`
 block is updated without asking.
 
 If yes, ask in one go: the channel (a label for the docs; the webhook decides the real
@@ -407,7 +409,7 @@ Show the user, before any commit:
 
 On the user's go:
 - Branch `chore/agentic-code-setup` from the default branch (develop if present).
-- Commit `chore(agents): Graffino agentic code setup v1` with the session's co-author trailer.
+- Commit `chore(agents): Short agentic code setup v1` with the session's co-author trailer.
 - Merge into the default branch locally with `--no-ff`. Do not push unless the
   user says so. Do not tag or release.
 - Memory facts that now live in the repo: remove them from the memory folder and
@@ -427,13 +429,25 @@ release last. Report what changed.
 
 **Repo variants.** Before you copy a file "as is" (lint, scripts, skills, agents),
 compare it with the template of the stamped release. When the repo changed it in its
-own commits (`git log -- <file>`; for example a "Relay variant" of `team-checks.py`, or
+own commits (`git log -- <file>`; for example a repo-specific variant of `team-checks.py`, or
 a check removed because the repo has no team addon), it is a variant: apply only the
 template's changes since that release to it, keep the repo's changes, and name the
 file in the report. Never overwrite a variant.
 
-On the go, commit `chore(agents): Graffino agentic code setup <release>` on
+On the go, commit `chore(agents): Short agentic code setup <release>` on
 `chore/agentic-code-setup` and merge it locally, as in step 6.
+
+From 1.5 to **1.6**:
+- The skill was renamed (Graffino Agentic Code Setup → Short Agentic Code Setup,
+  `/short-agentic-code-setup`). In every file of the repo, rename the markers
+  `graffino-agentic:` → `short-agentic:` (base, team, clickup, slack; begin and end)
+  and the `Graffino agentic` / `Graffino Agentic Code Setup` header comments in copied
+  files (`templates/setup-version`, workflow and script headers) to `Short`. No
+  content changes besides the names; repo variants keep their own changes.
+- Copied scripts (`ledger-lint.py`, `clickup-sync.py`, `slack-notify.py`,
+  `team-checks.py`) get only the rename.
+- Tell the user once: the skill now installs as `~/.claude/skills/short-agentic-code-setup`
+  and the SessionStart hook path changes to match (README "Install").
 
 From 1.4 to **1.5**:
 - Add `docs/agents/.setup-version` (step 3). No other file changes.
