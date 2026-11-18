@@ -1,10 +1,49 @@
 # Short Agentic Code Setup (Claude Code skill)
 
+<!-- hero image goes here -->
+
+> This harness is a highly simplified version of the agentic workflow we use at Short.
+> The ideas are the same — rules and knowledge live in the repository, the agent plans
+> then builds, and you stay in the loop — but the setup we run day to day has more
+> around them.
+
 A Claude Code skill that installs a small, self-contained agentic working system into
 any code repository, new or existing. Every file it writes lives in that repository;
 there is no shared rules folder and no separate docs repo.
 
 The base has no tickets, no PRs and no reviews by default. An optional **team addon** brings them back.
+
+## How it works
+
+```mermaid
+flowchart TD
+  install[Install the skill] --> hook[Optional SessionStart hook]
+  hook --> run["Run /short-agentic-code-setup in a repo"]
+  run --> detect[Detect stack, commands and layout]
+  detect --> existing{Existing repo with code?}
+  existing -->|Yes| backfill[Backfill: assume from the code]
+  backfill --> clashes{Clashes?}
+  clashes -->|Yes| review[Review them in a local page]
+  review --> write[Write rules, ledger and skills into the repo]
+  clashes -->|No| write
+  existing -->|No| write
+  write --> addons["Ask about optional addons: team, ClickUp, Slack"]
+  addons --> commit[Report, then commit locally on your go]
+  commit --> daily["Day to day: /plan then /build, or /start with the team addon"]
+  hook -.-> update[If the repo's setup is behind, re-run first]
+  update -.-> run
+```
+
+You install the skill on your machine and run `/short-agentic-code-setup` in a
+repository. It detects the stack and, in a repo that already has code, backfills a
+knowledge ledger from what the code actually does — entries the code consistently
+follows are recorded as approved, and only clashes go to a temporary local review
+page. It then writes the rules, the ledger, and the `/plan` and `/build` skills into
+that repo, and asks whether to add the optional team, ClickUp, or Slack addons.
+Blocks marked `short-agentic:…` are owned by the skill, so a later re-run can update
+them without touching the rest of the file. Nothing is committed until you say so,
+and nothing is pushed. A SessionStart hook can keep the skill itself up to date and,
+when a repo's setup stamp is behind, tell Claude to re-run before the task.
 
 ## What it adds to a repo
 
