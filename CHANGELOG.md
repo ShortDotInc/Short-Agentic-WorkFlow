@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.6.0 — 2026-11-18
+
+- **Renamed** from Graffino Agentic Code Setup to **Short Agentic Code Setup**; the
+  repo moved to `ShortDotInc/Short-Agentic-WorkFlow`. Skill and command:
+  `short-agentic-code-setup`; markers `short-agentic:…`; env var
+  `SHORT_AGENTIC_FORCE_PULL`; cache `~/.cache/short-agentic`.
+- **Legacy markers:** the auto update check and the ClickUp sync still recognise the
+  old `graffino-agentic:…` markers; the re-run renames them (SKILL.md, "From 1.5 to 1.6").
+- **Runners:** the self-hosted runner is offered when the team has one, with its own
+  labels, instead of a fixed company runner.
+
 ## 1.5.0 — 2026-11-09
 
 - **Auto update:** `tools/check-update.py` runs as a SessionStart hook. It pulls the
@@ -15,7 +26,7 @@
 
 ## 1.4.0 — 2026-11-05
 
-Rules brought over from FiscalLink-Docs (2026-10-18 to 10-30):
+Rules brought over from a production project's docs (2026-10-18 to 10-30):
 
 - **Deliveries (team addon):** related tickets that ship together share one
   integration branch and draft PR, with one `Fixes` / `Part of` line per ticket and
@@ -53,8 +64,8 @@ Rules brought over from FiscalLink-Docs (2026-10-18 to 10-30):
 - **CI:** the ClickUp and Slack scripts cover every ticket in the PR's `Fixes` /
   `Part of` lines (the ClickUp workflow also runs on edited PRs); `team-checks.py`
   fails when a commit names a ticket the PR Summary doesn't. Workflows offer a
-  1Password service account (`OP_SERVICE_ACCOUNT_TOKEN`) or a repository secret. The
-  Graffino self-hosted runner is recommended (still asked).
+  1Password service account (`OP_SERVICE_ACCOUNT_TOKEN`) or a repository secret. A
+  self-hosted runner is recommended (still asked).
 - **`.gitignore`:** `.claude/worktrees/` is ignored.
 
 ## 1.3.1 — 2026-10-23
@@ -65,7 +76,7 @@ Rules brought over from FiscalLink-Docs (2026-10-18 to 10-30):
 
 ## 1.3.0 — 2026-10-23
 
-Lessons from the SysOps-Fleet setup (2026-10-22):
+Lessons from setting up a device-management repo (2026-10-22):
 
 - **`.gitignore` check:** a repo that ignores all of `.claude/` now gets
   `.claude/*` + `!.claude/skills/` + `!.claude/agents/`, so the project skills and
@@ -164,4 +175,4 @@ First release.
   draft PRs with a five-section template, `/start` pipeline with product owner,
   test author and reviewer agents and three gates, a journal per ticket, manual
   tests, and a self-contained CI check (`team-checks.py`; asks for the runner).
-- Piloted on SysOps-Fleet-AppStore.
+- Piloted on an internal app-store repo.

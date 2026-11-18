@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""ClickUp sync (Graffino Agentic Code Setup, ClickUp addon). Stdlib only.
+"""ClickUp sync (Short Agentic Code Setup, ClickUp addon). Stdlib only.
 
 Modes
   pr-link        PR opened or edited: comment the branch and PR links on the ticket
@@ -184,7 +184,7 @@ def doc_files():
 
 def page_body(path):
     text = open(os.path.join(ROOT, path), encoding="utf-8").read()
-    text = re.sub(r"<!-- graffino-agentic[^>]*-->\n?", "", text)
+    text = re.sub(r"<!-- (?:short|graffino)-agentic[^>]*-->\n?", "", text)
     repo = os.path.basename(ROOT)
     title = next((l[2:].strip() for l in text.splitlines() if l.startswith("# ")), path)
     # No commit hash in the header: the page changes only when its file changes.

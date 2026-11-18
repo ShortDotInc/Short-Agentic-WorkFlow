@@ -1,6 +1,6 @@
 # AGENTS.md — {{repo}}
 
-<!-- graffino-agentic:begin v1 -->
+<!-- short-agentic:begin v1 -->
 ## How we work here
 
 **Before any work:** `git fetch --all --prune`, then `git pull --ff-only`. Stop on a
@@ -75,7 +75,7 @@ without new evidence. A rejected proposal is added there with the reason.
   on it. Any edit to an entry removes its Confirmed line.
 - A new reusable practice becomes a `candidate` pattern in the same session.
 - A settled constraint becomes a decision PROPOSAL in the same session.
-<!-- graffino-agentic:end -->
+<!-- short-agentic:end -->
 
 ## 1. What this repo is
 {{3–5 lines: purpose, who uses it, where it runs}}

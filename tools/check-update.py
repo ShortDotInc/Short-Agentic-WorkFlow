@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Auto update check for the Graffino agentic code setup (Claude Code SessionStart hook).
+"""Auto update check for the Short agentic code setup (Claude Code SessionStart hook).
 
 1. Pulls this skill repo (fast-forward only, clean tree only, at most once per
    THROTTLE_HOURS) so the skill on disk follows its upstream branch.
-2. When the session's repo carries the setup (AGENTS.md has the graffino-agentic
-   marker) and its stamp `docs/agents/.setup-version` is older than VERSION, it prints
+2. When the session's repo carries the setup (AGENTS.md has the short-agentic
+   marker, or the legacy graffino-agentic one from before 1.6) and its stamp `docs/agents/.setup-version` is older than VERSION, it prints
    SessionStart context that tells Claude to run the skill's re-run before the task.
 
 It never writes into the session's repo and never fails the session: every error
@@ -12,11 +12,11 @@ ends in a silent exit 0.
 
 Install (~/.claude/settings.json):
   "SessionStart": [{"matcher": "startup|clear", "hooks": [{"type": "command",
-    "command": "python3 ~/.claude/skills/graffino-agentic-code-setup/tools/check-update.py",
+    "command": "python3 ~/.claude/skills/short-agentic-code-setup/tools/check-update.py",
     "timeout": 20}]}]
 
 Manual run:  echo '{"cwd": "/path/to/repo"}' | python3 tools/check-update.py
-Force a pull now:  GRAFFINO_AGENTIC_FORCE_PULL=1 ... (ignores the throttle)
+Force a pull now:  SHORT_AGENTIC_FORCE_PULL=1 ... (ignores the throttle)
 """
 import json
 import os
@@ -27,9 +27,10 @@ import time
 
 SKILL = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 STAMP = os.path.join("docs", "agents", ".setup-version")
-MARKER = "graffino-agentic:begin v"
+MARKERS = ("short-agentic:begin v",
+           "graffino-agentic:begin v")  # legacy marker from before 1.6 (the old skill name)
 THROTTLE_HOURS = 6
-CACHE = os.path.join(os.path.expanduser("~"), ".cache", "graffino-agentic")
+CACHE = os.path.join(os.path.expanduser("~"), ".cache", "short-agentic")
 LAST_PULL = os.path.join(CACHE, "last-pull")
 
 
@@ -50,7 +51,7 @@ def read_version():
 
 def pull_skill():
     """Fast-forward the skill repo. Returns 'old -> new' when VERSION changed, else None."""
-    force = os.environ.get("GRAFFINO_AGENTIC_FORCE_PULL") == "1"
+    force = os.environ.get("SHORT_AGENTIC_FORCE_PULL") == "1"
     try:
         if not force and time.time() - os.path.getmtime(LAST_PULL) < THROTTLE_HOURS * 3600:
             return None
@@ -108,7 +109,7 @@ def main():
         agents = open(os.path.join(root, "AGENTS.md"), encoding="utf-8").read()
     except OSError:
         return
-    if MARKER not in agents:
+    if not any(m in agents for m in MARKERS):
         return  # not set up: offering the setup is a separate rule
 
     current = read_version()
@@ -126,11 +127,11 @@ def main():
     have = stamp_text or "an unknown release (no docs/agents/.setup-version; read the markers and files)"
     notes = changelog_since(stamp)
     lines = [
-        "[graffino-agentic auto update]",
-        f"This repo carries the Graffino agentic code setup at {have}. The skill on disk is at {current}"
+        "[short-agentic auto update]",
+        f"This repo carries the Short agentic code setup at {have}. The skill on disk is at {current}"
         + (f" (just pulled: {skill_update})." if skill_update else "."),
         "Before the user's task, and after the global fetch/pull step, run the "
-        "graffino-agentic-code-setup skill in re-run (update) mode for this repo. "
+        "short-agentic-code-setup skill in re-run (update) mode for this repo. "
         "Follow its 'Re-run (update)' section for every release after the stamp.",
         "Rules: tell the user in one line that the update runs; ask only the questions the "
         "re-run needs; commit only on the user's go; never push.",

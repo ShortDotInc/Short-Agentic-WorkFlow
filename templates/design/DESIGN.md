@@ -1,6 +1,6 @@
 # DESIGN — {{repo}}
 
-<!-- graffino-agentic:begin v1 -->
+<!-- short-agentic:begin v1 -->
 > The design guardrails for this app. Every UI change follows them. A change to a
 > token or a rule here is a PROPOSAL (AGENTS.md → The gate).
 
@@ -93,7 +93,7 @@ screens), from the mocks or screenshots. Frame names are `<DS-id> · <screen>`.
 DS- IDs are for the tools (registry, mocks, board, Figma frames). Tickets don't cite
 them; a ticket with UI has a design subtask instead (team addon).
 
-<!-- graffino-agentic:end -->
+<!-- short-agentic:end -->
 
 ## Source
 - Design board: {{Claude Design board URL | none yet}} (published from `mocks/`, never pulled)

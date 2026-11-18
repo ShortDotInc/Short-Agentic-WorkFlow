@@ -1,9 +1,9 @@
 # TEAM — {{repo}}
 
-<!-- graffino-agentic:team:begin v1 -->
+<!-- short-agentic:team:begin v1 -->
 > Settings for the team addon. AGENTS.md → "Team workflow" holds the rules; this
 > file holds the values they use. Change a value here, not in the rules.
-<!-- graffino-agentic:team:end -->
+<!-- short-agentic:team:end -->
 
 | Setting | Value |
 |---|---|
