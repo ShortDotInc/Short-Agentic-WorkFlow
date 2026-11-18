@@ -4,6 +4,7 @@
 
 - **Docs:** README notes that this harness is a highly simplified version of the
   workflow used at Short, and adds a How it works schematic.
+- **Docs:** README hero image (`assets/hero.svg`).
 
 ## 1.6.0 — 2026-11-18
 
