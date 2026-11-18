@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- **Docs:** README notes that this harness is a highly simplified version of the
+  workflow used at Short, and adds a How it works schematic.
+
 ## 1.6.0 — 2026-11-18
 
 - **Renamed** from Graffino Agentic Code Setup to **Short Agentic Code Setup**; the
