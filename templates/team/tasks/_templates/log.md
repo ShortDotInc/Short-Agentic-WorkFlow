@@ -2,7 +2,7 @@
 ticket: {{PREFIX}}-XXX
 session-start: YYYY-MM-DD HH:MM   # local time, 24h
 session-end: YYYY-MM-DD HH:MM
-author: "<who drove the session, e.g. Zeno + Claude>"
+author: "<who drove the session, e.g. Alex + Claude>"
 branch:
 status-at-end: in-progress | blocked | in-review | done
 ---

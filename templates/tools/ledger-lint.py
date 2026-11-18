@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ledger lint for docs/agents (Graffino Agentic Code Setup).
+"""Ledger lint for docs/agents (Short Agentic Code Setup).
 
 Checks the decisions / patterns / contracts / open-questions ledger and rebuilds
 its indexes. Stdlib only. Run from the repo root:
@@ -101,10 +101,10 @@ def is_sup(e):
 def sup_skeleton(prefix):
     main, *_, sup = KINDS[prefix]
     kind = main.split(".")[0].capitalize()
-    return (f"# {kind} superseded\n\n<!-- graffino-agentic:begin v1 -->\n"
+    return (f"# {kind} superseded\n\n<!-- short-agentic:begin v1 -->\n"
             f"> Never obeyed; read only to explain old code or a past choice. "
             f"`ledger-lint.py --fix` keeps this file in sync with `{main}`.\n"
-            f"<!-- graffino-agentic:end -->\n\n## Index\n\n---\n")
+            f"<!-- short-agentic:end -->\n\n## Index\n\n---\n")
 
 
 def move_entries(prefix):

@@ -1,6 +1,6 @@
 # docs/agents — how this repo works with AI agents
 
-<!-- graffino-agentic:begin v1 -->
+<!-- short-agentic:begin v1 -->
 > For people. One page. The agents read `AGENTS.md` at the repo root; this page
 > tells you how to drive them and where things are.
 
@@ -19,7 +19,7 @@
 | Show a design to people | "publish the board" (one way: repo → board; edits on the board are lost) |
 | Explain old code | `DECISIONS-SUPERSEDED.md`, `PATTERNS-SUPERSEDED.md` (never obeyed) |
 | Re-check the ledger | `python3 docs/agents/tools/ledger-lint.py` (`--fix` rebuilds the indexes, `--next D` gives the next ID) |
-| Update this setup | `/graffino-agentic-code-setup` (needs the skill installed) |
+| Update this setup | `/short-agentic-code-setup` (needs the skill installed) |
 | Mine the code again | "backfill again" → review only the clashes in the page that opens |
 
 ## Your calls in a plan
@@ -34,4 +34,4 @@ pattern or contract, promote a candidate, or add a decision.
 
 ## Words
 `CONTEXT.md` at the repo root holds the approved terms for this project.
-<!-- graffino-agentic:end -->
+<!-- short-agentic:end -->

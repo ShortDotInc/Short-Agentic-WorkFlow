@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Temporary review UI for backfill clashes (Graffino Agentic Code Setup).
+"""Temporary review UI for backfill clashes (Short Agentic Code Setup).
 
 Serves one page on 127.0.0.1 that shows each clash in
 docs/agents/backfill-review.json and saves every decision back into that file at

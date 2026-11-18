@@ -1,4 +1,4 @@
-<!-- graffino-agentic:team:begin v1 -->
+<!-- short-agentic:team:begin v1 -->
 ## Team workflow (for people)
 
 **First day:** connect the tracker to Claude Code (TEAM.md → "Tracker access for
@@ -22,4 +22,4 @@ together share one branch and PR (a delivery); parallel agents work on private
 branches the conductor integrates.
 
 Agents never merge, approve, close tickets, or mark a manual test passed.
-<!-- graffino-agentic:team:end -->
+<!-- short-agentic:team:end -->

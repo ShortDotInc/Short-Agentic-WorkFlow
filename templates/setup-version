@@ -1,4 +1,4 @@
-# Graffino agentic code setup: the release applied to this repo. Written by the skill
+# Short agentic code setup: the release applied to this repo. Written by the skill
 # at setup and at every re-run; read by the skill's auto update check. Do not edit.
 release: {{RELEASE}}
 addons: {{ADDONS}}

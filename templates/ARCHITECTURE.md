@@ -1,9 +1,9 @@
 # Architecture — {{repo}}
 
-<!-- graffino-agentic:begin v1 -->
+<!-- short-agentic:begin v1 -->
 > How this repo is built, generated from the code at backfill and kept current by
 > whoever changes the structure. The code wins: when this page is wrong, fix it.
-<!-- graffino-agentic:end -->
+<!-- short-agentic:end -->
 
 ## Overview
 {{3–6 lines: what runs where, for whom}}

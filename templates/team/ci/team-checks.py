@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Team workflow checks for a pull request (Graffino agentic team addon).
+"""Team workflow checks for a pull request (Short agentic team addon).
 
 Checks the branch name, every commit title in the PR, the five PR description
 sections, the "Fixes / Part of <ticket>" lines (every ticket a commit names is one of

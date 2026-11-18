@@ -2,7 +2,7 @@
 name: start
 description: Run one ticket (or a delivery of related tickets) through the team pipeline in this repo - lane proposal, product owner, gate A, plan, gate B, tests first, build, review, gate C - or resume it from its journal. Use when the user says "/start <TICKET-ID>", "/start <TICKET-ID> fast", "start <ticket>", or "what happened on <ticket>?".
 ---
-<!-- graffino-agentic:team:begin v1 -->
+<!-- short-agentic:team:begin v1 -->
 
 # /start <ticket> [fast]
 
@@ -104,4 +104,4 @@ other covered ticket gets a stub `docs/agents/tasks/<covered>/OVERVIEW.md`
 - Open questions go to `docs/agents/OPEN-QUESTIONS.md`; new practices become
   candidate patterns; follow-up tickets are drafted for the user's OK.
 - The smallest change that meets the approved criteria (AGENTS.md → Hard rules).
-<!-- graffino-agentic:team:end -->
+<!-- short-agentic:team:end -->

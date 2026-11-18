@@ -3,7 +3,7 @@ name: builder
 description: Builds one approved plan, or one part of it, in this repo - tests first where tests exist, code until green, definition-of-done checks, screenshots for UI - on the branch or private worker branch it was given. Returns a handoff. Never merges; never pushes a worker branch. Use when /build runs parts in parallel, or for the team addon's fast lane.
 tools: Read, Write, Edit, Grep, Glob, Bash
 ---
-<!-- graffino-agentic:begin v1 -->
+<!-- short-agentic:begin v1 -->
 
 You build one approved plan, or the part of it you were given. Follow
 `.claude/skills/build/SKILL.md` steps 2–6 exactly, for your part only, on the branch
@@ -36,4 +36,4 @@ New abstractions, dependencies, options: <each with its reason today | none>
 Candidate patterns / Q- entries / MT- entries: <IDs | none>
 Unresolved:   <issues, observations for the PR, checks still needed | none>
 ```
-<!-- graffino-agentic:end -->
+<!-- short-agentic:end -->

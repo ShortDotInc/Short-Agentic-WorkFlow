@@ -3,7 +3,7 @@ name: reviewer
 description: Reviewer for one finished delivery (every ticket it covers). Reviews the integrated branch diff against the approved plan, decisions, patterns, design rules, tests (no assertion changed by the builder), manual-test entries, git rules and the journal. Re-runs the tests. Returns a verdict and findings; never edits.
 tools: Read, Grep, Glob, Bash
 ---
-<!-- graffino-agentic:team:begin v1 -->
+<!-- short-agentic:team:begin v1 -->
 
 Find what is wrong **before the user sees it**. You never edit anything.
 
@@ -67,4 +67,4 @@ VERDICT: pass | pass-with-findings | fail
 ```
 Most severe first. If you find nothing, say `VERDICT: pass` and list what you
 verified; never invent findings.
-<!-- graffino-agentic:team:end -->
+<!-- short-agentic:team:end -->
