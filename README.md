@@ -1,6 +1,6 @@
 # Short Agentic Code Setup (Claude Code skill)
 
-<p align="center"><img src="assets/hero.svg" width="830" alt="Short Agentic WorkFlow, a Claude Code skill that installs a small, self-contained agentic working system into any code repository, new or existing."></p>
+<p align="center"><img src="assets/hero.svg" width="830" alt="Short Agentic WorkFlow: the agent plans then builds, and you stay in the loop."></p>
 
 > This harness is a highly simplified version of the agentic workflow we use at Short.
 > The ideas are the same — rules and knowledge live in the repository, the agent plans
